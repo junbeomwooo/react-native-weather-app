@@ -6,9 +6,9 @@ import { useEffect, useState } from "react";
 export default function Index() {
   const WINDOW_WIDTH = Dimensions.get("window").width;
 
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
-  );
+  const [location, setLocation] = useState<any>(null);
+
+  const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
   const permissionDenied = (title: string, msg: string) =>
     Alert.alert(title, msg, [
@@ -27,20 +27,46 @@ export default function Index() {
         return;
       }
 
-      let location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
+      let {
+        coords: { latitude, longitude },
+      } = await Location.getCurrentPositionAsync({ accuracy: 5 });
+
+      console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+
+      const address = await Location.reverseGeocodeAsync({
+        latitude,
+        longitude,
+      });
+
+      setLocation({ country: address[0]?.country, city: address[0]?.city });
+
+      const [current, daily] = await Promise.all([
+        fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`
+        ),
+        fetch(
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`
+        ),
+      ]);
+
+      const [currentWeather, dailyWeather] = await Promise.all([
+        current.json(),
+        daily.json(),
+      ]);
+
+      console.log(
+        `currentWeather:${JSON.stringify(currentWeather)}, dailyWeather:${JSON.stringify(dailyWeather)} `
+      );
     }
 
     getCurrentLocation();
-  }, []);
-
-  console.log(location);
+  }, [WEATHER_API_KEY]);
 
   return (
     <View className="flex-1">
-      <View className="flex-1 bg-orange-500 justify-center items-center">
+      <View className="flex-1 bg-[#FE6346] justify-center items-center">
         <Text style={{ fontSize: 45 }} className="font-semibold">
-          Copenhagen
+          {location?.city || "London"}
         </Text>
       </View>
       <ScrollView
@@ -50,7 +76,6 @@ export default function Index() {
         className="bg-[#FE6346] flex-1"
         contentContainerStyle={{
           justifyContent: "center",
-          alignItems: "center",
         }}
       >
         <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
