@@ -1,12 +1,22 @@
-import { Alert, Dimensions, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 import * as Location from "expo-location";
 import { useEffect, useState } from "react";
+
+import { useNavigation } from "expo-router";
 
 export default function Index() {
   const WINDOW_WIDTH = Dimensions.get("window").width;
 
   const [location, setLocation] = useState<any>(null);
+  const [dailyWeather, setDailyWeather] = useState([]);
 
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
@@ -45,7 +55,7 @@ export default function Index() {
           `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`
         ),
         fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`
+          `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
         ),
       ]);
 
@@ -54,86 +64,82 @@ export default function Index() {
         daily.json(),
       ]);
 
-      console.log(
-        `currentWeather:${JSON.stringify(currentWeather)}, dailyWeather:${JSON.stringify(dailyWeather)} `
+      // console.log(
+      //   `${JSON.stringify(currentWeather)}`
+      // );
+
+      // console.log(`${JSON.stringify(dailyWeather)}`)
+
+      setDailyWeather(
+        dailyWeather?.list?.filter((v: any) => {
+          if (v?.dt_txt?.includes("12:00:00")) {
+            return v;
+          }
+        })
       );
     }
-
     getCurrentLocation();
   }, [WEATHER_API_KEY]);
 
+    const navigation = useNavigation();
+
+    useEffect(() => {
+    navigation.setOptions({ title: location?.city});
+  }, [navigation, location?.city]);
+
   return (
     <View className="flex-1">
-      <View className="flex-1 bg-[#FE6346] justify-center items-center">
+      {/* Date */}
+      <View className="flex-1 bg-green-200 justify-center items-center">
         <Text style={{ fontSize: 45 }} className="font-semibold">
-          {location?.city || "London"}
+          {location?.city}
         </Text>
       </View>
+
+      {/* Weather */}
       <ScrollView
         horizontal={true}
         pagingEnabled={true}
         showsHorizontalScrollIndicator={false}
-        className="bg-[#FE6346] flex-1"
+        className="bg-[#FE6346] flex-[2]"
         contentContainerStyle={{
           justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
-          <Text className="text-center font-semibold" style={{ fontSize: 128 }}>
-            27
-          </Text>
-          <Text
-            style={{ fontSize: 45, marginTop: -15 }}
-            className="font-medium text-center"
-          >
-            Windy
-          </Text>
-        </View>
-        <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
-          <Text className="text-center font-semibold" style={{ fontSize: 128 }}>
-            28
-          </Text>
-          <Text
-            style={{ fontSize: 45, marginTop: -15 }}
-            className="font-medium text-center"
-          >
-            Windy
-          </Text>
-        </View>
-        <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
-          <Text className="text-center font-semibold" style={{ fontSize: 128 }}>
-            29
-          </Text>
-          <Text
-            style={{ fontSize: 45, marginTop: -15 }}
-            className="font-medium text-center"
-          >
-            Windy
-          </Text>
-        </View>
-        <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
-          <Text className="text-center font-semibold" style={{ fontSize: 128 }}>
-            30
-          </Text>
-          <Text
-            style={{ fontSize: 45, marginTop: -15 }}
-            className="font-medium text-center"
-          >
-            Windy
-          </Text>
-        </View>
-        <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
-          <Text className="text-center font-semibold" style={{ fontSize: 128 }}>
-            31
-          </Text>
-          <Text
-            style={{ fontSize: 45, marginTop: -15 }}
-            className="font-medium text-center"
-          >
-            Windy
-          </Text>
-        </View>
+        {dailyWeather?.length > 0 ? (
+          dailyWeather?.map((v: any, i) => {
+            console.log(v);
+            return (
+              <View key={i} className="flex-1" style={{ width: WINDOW_WIDTH }}>
+                <Text
+                  className="text-center font-semibold"
+                  style={{ fontSize: 128 }}
+                >
+                  {v?.main?.temp?.toFixed(0)}°
+                </Text>
+                <Text
+                  style={{ fontSize: 35, marginTop: -15 }}
+                  className="font-medium text-center"
+                >
+                  {v?.weather[0]?.main}
+                </Text>
+              </View>
+            );
+          })
+        ) : (
+          <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
+            <ActivityIndicator size="large" color="white" />
+          </View>
+        )}
       </ScrollView>
+
+      {/* Date */}
+      <View className="flex-1 bg-green-200 justify-center items-center">
+        <Text style={{ fontSize: 45 }} className="font-semibold">
+          {location?.city}
+        </Text>
+      </View>
     </View>
   );
 }
