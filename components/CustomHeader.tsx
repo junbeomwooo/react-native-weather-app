@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function CustomHeader({ title }: { title?: string }) {
   return (
     <SafeAreaView
-      className="bg-yellow-300 flex-row justify-between items-center"
+      className="bg-[#FE6346] flex-row justify-between items-center"
       style={{
         paddingTop: 20,
         paddingLeft: 20,
