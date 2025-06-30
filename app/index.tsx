@@ -12,6 +12,10 @@ import { useEffect, useState } from "react";
 
 import { useNavigation } from "expo-router";
 
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import Fontisto from "@expo/vector-icons/Fontisto";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+
 export default function Index() {
   const WINDOW_WIDTH = Dimensions.get("window").width;
 
@@ -88,59 +92,6 @@ export default function Index() {
   }, [navigation, location?.city]);
 
   return (
-    // <View className="flex-1">
-    //   {/* Date */}
-    //   <View className="flex-1 bg-[#FE6346]  justify-center items-center">
-    //     <Text style={{ fontSize: 45 }} className="font-semibold">
-    //       {location?.city}
-    //     </Text>
-    //   </View>
-
-    //   {/* Weather */}
-    //   <ScrollView
-    //     horizontal={true}
-    //     pagingEnabled={true}
-    //     showsHorizontalScrollIndicator={false}
-    //     className="bg-[#FE6346] flex-[2]"
-    //     contentContainerStyle={{
-    //       justifyContent: "center",
-    //       alignItems: "center",
-    //     }}
-    //   >
-    //     {dailyWeather?.length > 0 ? (
-    //       dailyWeather?.map((v: any, i) => {
-    //         console.log(v);
-    //         return (
-    //           <View key={i} className="flex-1" style={{ width: WINDOW_WIDTH }}>
-    //             <Text
-    //               className="text-center font-semibold"
-    //               style={{ fontSize: 128 }}
-    //             >
-    //               {v?.main?.temp?.toFixed(0)}°
-    //             </Text>
-    //             <Text
-    //               style={{ fontSize: 35, marginTop: -15 }}
-    //               className="font-medium text-center"
-    //             >
-    //               {v?.weather[0]?.main}
-    //             </Text>
-    //           </View>
-    //         );
-    //       })
-    //     ) : (
-    //       <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
-    //         <ActivityIndicator size="large" color="white" />
-    //       </View>
-    //     )}
-    //   </ScrollView>
-
-    //   {/* Date */}
-    //   <View className="flex-1 bg-[#FE6346]  justify-center items-center">
-    //     <Text style={{ fontSize: 45 }} className="font-semibold">
-    //       {location?.city}
-    //     </Text>
-    //   </View>
-    // </View>
     <ScrollView
       className="flex-1 bg-[#FE6346]"
       horizontal={true}
@@ -153,29 +104,108 @@ export default function Index() {
     >
       {dailyWeather?.length > 0 ? (
         dailyWeather?.map((v: any, i) => {
-          console.log(v);
+          const date = new Date(v?.dt_txt);
+
+          const weekday = date?.toLocaleDateString("en-GB", {
+            weekday: "long",
+          });
+          const dateMonth = date?.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "long",
+          });
+
           return (
             <View key={i} className="flex-1" style={{ width: WINDOW_WIDTH }}>
               {/* Date */}
-              <View className="flex-1 bg-blue-200  justify-center gap-1 px-[30px]">
-                <Text className="font-semibold text-[25px]">Monday</Text>
-                <Text className="text-[15px]">04 September</Text>
-                <View className="w-[80%] border-b-2 border-white my-2" />
+              <View className="flex-[1] justify-center gap-1 px-[30px]">
+                <Text className="font-semibold text-[25px]">{weekday}</Text>
+                <Text className="text-[15px]">{dateMonth}</Text>
               </View>
+              {/* hr */}
+              <View
+                className="border-b-[1.3px] border-black m-auto"
+                style={{ width: WINDOW_WIDTH - 60 }}
+              />
               {/* Degree */}
-              <View className="flex-[2]">
-                <Text className="text-center font-semibold text-[128px]">
+              <View className="flex-[2] justify-center m-auto">
+                <Text className="font-semibold text-[128px]">
                   {v?.main?.temp?.toFixed(0)}°
                 </Text>
-                <Text className="font-medium text-center text-[35px] mt-[-15px]">
+                <Text className="font-medium text-[30px] mt-[-15px]">
                   {v?.weather[0]?.main}
                 </Text>
+              </View>
+              {/* hr 2 */}
+              <View
+                className="border-b-[1.3px] border-black m-auto"
+                style={{ width: WINDOW_WIDTH - 60 }}
+              />
+              {/* Conditions */}
+              <View className="flex-[1.4] px-[30px] justify-center gap-6">
+                {/* feels like, pop */}
+                <View className="flex-row justify-between">
+                  {/* feels like */}
+                  <View className="flex-row items-center gap-2">
+                    <FontAwesome5
+                      name={
+                        v?.main?.feels_like > 20
+                          ? `temperature-high`
+                          : `temperature-low`
+                      }
+                      size={18}
+                      color="black"
+                    />
+                    <Text className="text-[18px] font-semibold">
+                      {v?.main?.feels_like}°C
+                    </Text>
+                  </View>
+
+                  {/* pop */}
+                  <View className="flex-row items-center gap-2">
+                    <Fontisto
+                      name="rain"
+                      size={18}
+                      className="font-bold"
+                      color="black"
+                    />
+                    <View className="flex-row justify-between">
+                      <Text className="text-[18px] font-semibold">
+                        {v?.pop * 100}%
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+
+                {/* humidity, wind */}
+                <View className="flex-row justify-between">
+                  <View className="flex-row items-center gap-2">
+                    <MaterialCommunityIcons
+                      name="water-outline"
+                      size={24}
+                      color="black"
+                      className="ml-[-6px]"
+                    />
+                    <Text className="text-[18px] font-semibold">
+                      {v?.main?.humidity}%
+                    </Text>
+                  </View>
+
+                  <View className="flex-row items-center gap-2">
+                    <FontAwesome5 name="wind" size={18} color="black" />
+                    <Text className="text-[18px] font-semibold">
+                      {v?.wind?.speed}m/s
+                    </Text>
+                  </View>
+                </View>
               </View>
             </View>
           );
         })
       ) : (
-        <View className="flex-1" style={{ width: WINDOW_WIDTH }}>
+        <View
+          className="flex-1 justify-center items-center"
+          style={{ width: WINDOW_WIDTH }}
+        >
           <ActivityIndicator size="large" color="white" />
         </View>
       )}
