@@ -4,7 +4,7 @@ import {
   Dimensions,
   ScrollView,
   Text,
-  View,
+  View
 } from "react-native";
 
 import * as Location from "expo-location";
@@ -56,7 +56,7 @@ export default function Index() {
 
       const [current, daily] = await Promise.all([
         fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`
+          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
         ),
         fetch(
           `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
@@ -68,11 +68,10 @@ export default function Index() {
         daily.json(),
       ]);
 
-      // console.log(
-      //   `${JSON.stringify(currentWeather)}`
-      // );
 
-      // console.log(`${JSON.stringify(dailyWeather)}`)
+
+
+      console.log(`${JSON.stringify(dailyWeather)}`)
 
       setDailyWeather(
         dailyWeather?.list?.filter((v: any) => {
