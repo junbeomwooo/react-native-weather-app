@@ -1,11 +1,18 @@
+import { ThemeContext } from "@/app/_layout";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useContext } from "react";
 import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CustomHeader({ title }: { title?: string }) {
+  const theme = useContext(ThemeContext);
+
+  const textColor = theme === "light" ? "text-black" : "text-white";
+  const iconColor = theme === "light" ? "black" : "white";
+
   return (
     <SafeAreaView
-      className="bg-[#FE6346] flex-row justify-between items-center"
+      className="flex-row justify-between items-center"
       style={{
         paddingTop: 20,
         paddingLeft: 20,
@@ -13,11 +20,14 @@ export default function CustomHeader({ title }: { title?: string }) {
         paddingBottom: -10,
       }}
     >
-      <Ionicons name="menu-outline" size={26} color="black" />
-      <Text className="text-center font-medium" style={{ fontSize: 18 }}>
+      <Ionicons name="menu-outline" size={26} color={iconColor} />
+      <Text
+        className={`text-center font-medium ${textColor}`}
+        style={{ fontSize: 18 }}
+      >
         {title}
       </Text>
-      <Ionicons name="menu-outline" size={26} color="black" />
+      <Ionicons name="menu-outline" size={26} color={iconColor} />
     </SafeAreaView>
   );
 }

@@ -4,11 +4,11 @@ import {
   Dimensions,
   ScrollView,
   Text,
-  View
+  View,
 } from "react-native";
 
 import * as Location from "expo-location";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { useNavigation } from "expo-router";
 
@@ -16,7 +16,11 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
+import { ThemeContext } from "./_layout";
+
 export default function Index() {
+  const theme = useContext(ThemeContext);
+
   const WINDOW_WIDTH = Dimensions.get("window").width;
 
   const [location, setLocation] = useState<any>(null);
@@ -45,8 +49,6 @@ export default function Index() {
         coords: { latitude, longitude },
       } = await Location.getCurrentPositionAsync({ accuracy: 5 });
 
-      console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-
       const address = await Location.reverseGeocodeAsync({
         latitude,
         longitude,
@@ -68,10 +70,7 @@ export default function Index() {
         daily.json(),
       ]);
 
-
-
-
-      console.log(`${JSON.stringify(dailyWeather)}`)
+      // console.log(`${JSON.stringify(dailyWeather)}`)
 
       setDailyWeather(
         dailyWeather?.list?.filter((v: any) => {
@@ -92,7 +91,7 @@ export default function Index() {
 
   return (
     <ScrollView
-      className="flex-1 bg-[#FE6346]"
+      className="flex-1"
       horizontal={true}
       pagingEnabled={true}
       showsHorizontalScrollIndicator={false}
@@ -113,30 +112,46 @@ export default function Index() {
             month: "long",
           });
 
+          const textColor = theme === "light" ? "text-black" : "text-white";
+          const borderColor = theme === "light" ? "border-black" : "border-white";
+          const iconColor = theme === "light" ? "black" : "white";
+
           return (
             <View key={i} className="flex-1" style={{ width: WINDOW_WIDTH }}>
               {/* Date */}
               <View className="flex-[1] justify-center gap-1 px-[30px]">
-                <Text className="font-semibold text-[25px]">{weekday}</Text>
-                <Text className="text-[15px]">{dateMonth}</Text>
+                <Text
+                  className={`font-semibold text-[25px] ${textColor}`}
+                >
+                  {weekday}
+                </Text>
+                <Text
+                  className={`text-[15px]  ${textColor}`}
+                >
+                  {dateMonth}
+                </Text>
               </View>
               {/* hr */}
               <View
-                className="border-b-[1.3px] border-black m-auto"
+                className={`border-b-[1.3px] ${borderColor} m-auto`}
                 style={{ width: WINDOW_WIDTH - 60 }}
               />
               {/* Degree */}
               <View className="flex-[2] justify-center m-auto">
-                <Text className="font-semibold text-[128px]">
+                <Text
+                  className={`font-semibold text-[128px]  ${textColor}`}
+                >
                   {v?.main?.temp?.toFixed(0)}°
                 </Text>
-                <Text className="font-medium text-[30px] mt-[-15px]">
+                <Text
+                  className={`font-medium text-[30px] mt-[-15px]  ${textColor}`}
+                >
                   {v?.weather[0]?.main}
                 </Text>
               </View>
               {/* hr 2 */}
               <View
-                className="border-b-[1.3px] border-black m-auto"
+                className={`border-b-[1.3px]  ${borderColor} m-auto`}
                 style={{ width: WINDOW_WIDTH - 60 }}
               />
               {/* Conditions */}
@@ -152,9 +167,9 @@ export default function Index() {
                           : `temperature-low`
                       }
                       size={18}
-                      color="black"
+                      color={iconColor}
                     />
-                    <Text className="text-[18px] font-semibold">
+                    <Text className={`text-[18px] font-semibold ${textColor}`}>
                       {v?.main?.feels_like}°C
                     </Text>
                   </View>
@@ -165,10 +180,10 @@ export default function Index() {
                       name="rain"
                       size={18}
                       className="font-bold"
-                      color="black"
+                      color={iconColor}
                     />
                     <View className="flex-row justify-between">
-                      <Text className="text-[18px] font-semibold">
+                      <Text className={`text-[18px] font-semibold ${textColor}`}>
                         {v?.pop * 100}%
                       </Text>
                     </View>
@@ -181,17 +196,17 @@ export default function Index() {
                     <MaterialCommunityIcons
                       name="water-outline"
                       size={24}
-                      color="black"
+                      color={iconColor}
                       className="ml-[-6px]"
                     />
-                    <Text className="text-[18px] font-semibold">
+                    <Text className={`text-[18px] font-semibold ${textColor}`}>
                       {v?.main?.humidity}%
                     </Text>
                   </View>
 
                   <View className="flex-row items-center gap-2">
-                    <FontAwesome5 name="wind" size={18} color="black" />
-                    <Text className="text-[18px] font-semibold">
+                    <FontAwesome5 name="wind" size={18} color={iconColor} />
+                    <Text className={`text-[18px] font-semibold ${textColor}`}>
                       {v?.wind?.speed}m/s
                     </Text>
                   </View>
