@@ -28,6 +28,7 @@ export default function Index() {
   const [location, setLocation] = useState<any>(null);
 
   const [currentWeather, setCurrentWeather] = useState<any>({});
+  const [hourlyWeather, setHourlyWeather] = useState([]);
   const [dailyWeather, setDailyWeather] = useState([]);
 
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
@@ -60,7 +61,7 @@ export default function Index() {
 
       setLocation({ country: address[0]?.country, city: address[0]?.city });
 
-      const [current, daily] = await Promise.all([
+      const [current, hourly] = await Promise.all([
         fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
         ),
@@ -69,15 +70,20 @@ export default function Index() {
         ),
       ]);
 
-      const [currentWeather, dailyWeather] = await Promise.all([
+      const [currentWeather, hourlyWeather] = await Promise.all([
         current.json(),
-        daily.json(),
+        hourly.json(),
       ]);
 
+      // current weather
       setCurrentWeather(currentWeather);
 
+      // hourly weather
+      setHourlyWeather(hourlyWeather?.list?.slice(0, 8));
+
+      //  daily weather
       setDailyWeather(
-        dailyWeather?.list?.filter((v: any) => {
+        hourlyWeather?.list?.filter((v: any) => {
           if (v?.dt_txt?.includes("12:00:00")) {
             return v;
           }
@@ -187,6 +193,13 @@ export default function Index() {
     ? currentWeather.weather[0].main
     : null;
 
+  // Average temperature for 8 hours
+  const averageTemp = Math.round(
+    hourlyWeather?.reduce((acc: number, items: any) => {
+      return acc + (items?.main?.temp ?? 0);
+    }, 0) / 8
+  );
+
   return (
     <ScrollView
       className="flex-1 px-8"
@@ -199,13 +212,13 @@ export default function Index() {
       {currentWeather ? (
         <Fragment>
           {/* Current weather */}
-          <View className="justify-center mt-16">
+          <View className="justify-center mt-8">
             {/* Weather Icon */}
-            <View className="w-[250px] h-[250px] items-center justify-center">
-              {getWeatherIcons(weatherId ? weatherId : 0, 250)}
+            <View className="w-[260px] h-[260px] items-center justify-center">
+              {getWeatherIcons(weatherId ? weatherId : 0, 260)}
             </View>
             <Text
-              className={`text-[140px] font-medium ${theme === "light" ? "text-black" : "text-white"}`}
+              className={`text-[130px] font-medium ${theme === "light" ? "text-black" : "text-white"}`}
             >
               {/* Current temp */}
               {Math.round(currentWeather?.main?.temp)}°
@@ -213,7 +226,7 @@ export default function Index() {
 
             {/* Weather description */}
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} text-[35px] font-medium`}
+              className={`${theme === "light" ? "text-black" : "text-white"} text-[35px] font-medium mt-[-10px]`}
             >
               {weatherMain}
             </Text>
@@ -234,7 +247,28 @@ export default function Index() {
           </View>
 
           {/* Hr */}
-          <View className="w-full h-[1px] bg-white my-14" />
+          <View
+            className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
+          />
+
+          {/* Hourly forecast */}
+          <View className="w-full">
+            {/* title */}
+            <Text
+              className={`${theme === "light" ? "text-black" : "text-white"} font-bold text-[18px]`}
+            >
+              Hourly Forecast
+            </Text>
+
+            {/* subTitle */}
+            <Text
+              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[14px] mt-6`}
+            >
+              The average temperature will be {averageTemp}°C.
+            </Text>
+
+            <ScrollView className="flex-row">{}</ScrollView>
+          </View>
         </Fragment>
       ) : (
         /** Loading Bar (Indicator) */
