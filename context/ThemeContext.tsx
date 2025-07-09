@@ -1,11 +1,5 @@
 import { createContext } from "react";
 
-export const ThemeContext = createContext<"light" | "dark" | null>(null);
+export type Theme = "light" | "dark";
 
-export default function ThemeProvider() {
-  return (
-  <ThemeContext value="dark">
-    {children}
-  </ThemeContext>
-  );
-}
+export const ThemeContext = createContext<Theme | undefined>(undefined);

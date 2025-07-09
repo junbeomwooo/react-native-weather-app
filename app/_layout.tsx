@@ -1,13 +1,10 @@
 import CustomHeader from "@/components/CustomHeader";
+import { Theme, ThemeContext } from "@/context/ThemeContext";
 import "@/global.css";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { createContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-
-type Theme = "light" | "dark";
-
-export const ThemeContext = createContext<Theme>("light");
 
 export default function RootLayout() {
   const [theme, setTheme] = useState<Theme>("light");
@@ -16,9 +13,9 @@ export default function RootLayout() {
     const nowHour = new Date()?.getHours();
 
     if (nowHour > 20) {
-      setTheme("dark")
+      setTheme("dark");
     } else {
-      setTheme("light")
+      setTheme("light");
     }
   }, []);
 

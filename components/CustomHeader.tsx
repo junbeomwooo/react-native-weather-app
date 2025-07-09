@@ -1,4 +1,4 @@
-import { ThemeContext } from "@/app/_layout";
+import { ThemeContext } from "@/context/ThemeContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useContext } from "react";
 import { Text } from "react-native";
