@@ -15,13 +15,13 @@ import { Fragment, useContext, useEffect, useState } from "react";
 
 import { useNavigation } from "expo-router";
 
+import Feather from "@expo/vector-icons/Feather";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function Index() {
-  const { theme, sunrise, sunset, setSunrise, setSunset } =
-    useContext(ThemeContext);
+  const { theme, setSunrise, setSunset } = useContext(ThemeContext);
 
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -42,7 +42,6 @@ export default function Index() {
   useEffect(() => {
     async function getCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      console.log(status);
       if (status !== "granted") {
         permissionDenied(
           "Permission Denied",
@@ -71,7 +70,7 @@ export default function Index() {
         ),
       ]);
 
-      const [currentWeather, hourlyWeather] = await Promise.all([
+      const [currentWeatherJSON, hourlyWeatherJSON] = await Promise.all([
         current.json(),
         hourly.json(),
       ]);
@@ -79,25 +78,25 @@ export default function Index() {
       // set Sunrise, Sunset time for React Context
 
       // Sunrise hour
-      const sunriseDate = new Date(currentWeather?.sys?.sunrise * 1000);
+      const sunriseDate = new Date(currentWeatherJSON?.sys?.sunrise * 1000);
       const sunriseHours = sunriseDate.getHours();
 
       // Sunset hour
-      const sunsetDate = new Date(currentWeather?.sys?.sunset * 1000);
+      const sunsetDate = new Date(currentWeatherJSON?.sys?.sunset * 1000);
       const sunsetHours = sunsetDate.getHours();
 
       setSunrise(sunriseHours);
       setSunset(sunsetHours);
 
       // current weather
-      setCurrentWeather(currentWeather);
+      setCurrentWeather(currentWeatherJSON);
 
       // hourly weather
-      setHourlyWeather(hourlyWeather?.list?.slice(0, 10));
+      setHourlyWeather(hourlyWeatherJSON?.list?.slice(0, 10));
 
       //  daily weather
       setDailyWeather(
-        hourlyWeather?.list?.filter((v: any) => {
+        hourlyWeatherJSON?.list?.filter((v: any) => {
           if (v?.dt_txt?.includes("12:00:00")) {
             return v;
           }
@@ -205,8 +204,6 @@ export default function Index() {
     sunset: any,
     sunrise: any
   ) => {
-    console.log(sunset);
-    console.log(sunrise);
     if (storm?.includes(weatherId)) {
       return (
         <Ionicons
@@ -241,6 +238,7 @@ export default function Index() {
       );
     } else if (clear?.includes(weatherId)) {
       const clear =
+        // when its after sunset
         hours >= sunset || hours < sunrise ? (
           <Ionicons
             name="moon-outline"
@@ -248,6 +246,7 @@ export default function Index() {
             color={theme === "light" ? "black" : "white"}
           />
         ) : (
+          // when its before sunset
           <Fontisto
             name="day-sunny"
             size={size}
@@ -257,7 +256,15 @@ export default function Index() {
       return clear;
     } else if (fewClouds?.includes(weatherId)) {
       const fewClouds =
+        // when its after sunset
         hours >= sunset || hours < sunrise ? (
+          <Ionicons
+            name="cloudy-night-outline"
+            size={size}
+            color={theme === "light" ? "black" : "white"}
+          />
+        ) : (
+          // when its before sunset
           <Image
             source={require("../assets/images/day-cloudy.png")}
             style={{
@@ -267,14 +274,7 @@ export default function Index() {
               tintColor: theme === "light" ? "black" : "white",
             }}
           />
-        ) : (
-          <Ionicons
-            name="cloudy-night-outline"
-            size={size}
-            color={theme === "light" ? "black" : "white"}
-          />
         );
-
       return fewClouds;
     } else if (clouds?.includes(weatherId)) {
       return (
@@ -304,6 +304,14 @@ export default function Index() {
     }, 0) / hourlyWeather.length
   );
 
+  // Sunrise hour
+  const sunriseDate = new Date(currentWeather?.sys?.sunrise * 1000);
+  const sunrise = sunriseDate.getHours();
+
+  // Sunset hour
+  const sunsetDate = new Date(currentWeather?.sys?.sunset * 1000);
+  const sunset = sunsetDate.getHours();
+
   return (
     <ScrollView
       className="flex-1 px-8"
@@ -316,7 +324,7 @@ export default function Index() {
       {currentWeather ? (
         <Fragment>
           {/* Current weather */}
-          <View className="justify-center mt-8">
+          <View className="justify-center mt-14">
             {/* Weather Icon */}
             <View className="w-[260px] h-[260px] items-center justify-center">
               {getCurrentWeatherIcons(weatherId ? weatherId : 0, 260)}
@@ -371,7 +379,7 @@ export default function Index() {
               The average temperature will be {averageTemp}°C.
             </Text>
 
-            <ScrollView horizontal={true} className="mb-[200px]">
+            <ScrollView horizontal={true}>
               {hourlyWeather?.map((v: any, i: number) => {
                 /** Time format */
                 const hours = new Date(v?.dt_txt).getHours();
@@ -386,7 +394,7 @@ export default function Index() {
                 return (
                   <View key={i} className="mx-3">
                     <Text
-                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold `}
+                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-center`}
                     >
                       {formattedTime}
                     </Text>
@@ -410,6 +418,119 @@ export default function Index() {
               })}
             </ScrollView>
           </View>
+
+          {/* Hr */}
+          <View
+            className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
+          />
+
+          {/* Daily forecast */}
+          <View className="w-full">
+            {/* title */}
+            <Text
+              className={`${theme === "light" ? "text-black" : "text-white"} font-bold text-[18px]`}
+            >
+              Daily Forecast
+            </Text>
+
+            {/* subTitle */}
+            <Text
+              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[14px] my-7`}
+            >
+              Temperature information for the next 5 days starting today.
+            </Text>
+
+            <ScrollView horizontal={true}>
+              {dailyWeather?.map((v: any, i: number) => {
+                const hours = new Date(v?.dt_txt).getHours();
+
+                /** day format */
+                const day = new Date(v?.dt_txt).toLocaleDateString("en-US", {
+                  weekday: "short",
+                });
+
+                /** Weather icon */
+                const weatherIcons =
+                  v?.weather?.length > 0 ? v?.weather[0]?.id : null;
+
+                return (
+                  <View key={i} className="mx-3">
+                    <Text
+                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-center`}
+                    >
+                      {day}
+                    </Text>
+                    <View className="w-[35px] h-[35px] my-3 flex items-center justify-center">
+                      {getWeatherIconsByTime(
+                        weatherIcons,
+                        hours,
+                        35,
+                        sunset,
+                        sunrise
+                      )}
+                    </View>
+
+                    <Text
+                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-center text-[17px]`}
+                    >
+                      {Math.round(v?.main?.temp)}°
+                    </Text>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          {/* Hr */}
+          <View
+            className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
+          />
+
+          {/* Sunrise, Sunset */}
+          <View className="flex-row justify-between w-full">
+            {/* Sunrise */}
+            <View>
+              <Feather
+                name="sunrise"
+                size={120}
+                color={theme === "light" ? "black" : "white"}
+              />
+              <Text
+                className={`text-[20px] ${theme === "light" ? "text-black" : "text-white"} font-semibold text-[20px] my-6`}
+              >
+                Sunrise
+              </Text>
+              <Text
+                className={`text-[20px] ${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px]`}
+              >
+                {sunrise % 12 || 12}
+                {sunrise >= 12 ? "PM" : "AM"}
+              </Text>
+            </View>
+
+            {/* Sunset */}
+            <View>
+              <Feather
+                name="sunset"
+                size={120}
+                color={theme === "light" ? "black" : "white"}
+              />
+              <Text
+                className={`text-[20px] ${theme === "light" ? "text-black" : "text-white"} font-semibold text-[20px] my-6`}
+              >
+                Sunset
+              </Text>
+              <Text
+                className={`text-[20px] ${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px]`}
+              >
+                {sunset % 12 || 12}
+                {sunset >= 12 ? "PM" : "AM"}
+              </Text>
+            </View>
+          </View>
+
+          {/* Details */}
+          <View className="mt-10"></View>
         </Fragment>
       ) : (
         /** Loading Bar (Indicator) */
