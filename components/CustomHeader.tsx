@@ -5,7 +5,7 @@ import { Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CustomHeader({ title }: { title?: string }) {
-  const theme = useContext(ThemeContext);
+  const {theme} = useContext(ThemeContext);
 
   const textColor = theme === "light" ? "text-black" : "text-white";
   const iconColor = theme === "light" ? "black" : "white";

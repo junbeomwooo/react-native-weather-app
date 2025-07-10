@@ -20,7 +20,8 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 export default function Index() {
-  const theme = useContext(ThemeContext);
+  const { theme, sunrise, sunset, setSunrise, setSunset } =
+    useContext(ThemeContext);
 
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -75,11 +76,24 @@ export default function Index() {
         hourly.json(),
       ]);
 
+      // set Sunrise, Sunset time for React Context
+
+      // Sunrise hour
+      const sunriseDate = new Date(currentWeather?.sys?.sunrise * 1000);
+      const sunriseHours = sunriseDate.getHours();
+
+      // Sunset hour
+      const sunsetDate = new Date(currentWeather?.sys?.sunset * 1000);
+      const sunsetHours = sunsetDate.getHours();
+
+      setSunrise(sunriseHours);
+      setSunset(sunsetHours);
+
       // current weather
       setCurrentWeather(currentWeather);
 
       // hourly weather
-      setHourlyWeather(hourlyWeather?.list?.slice(0, 8));
+      setHourlyWeather(hourlyWeather?.list?.slice(0, 10));
 
       //  daily weather
       setDailyWeather(
@@ -91,7 +105,7 @@ export default function Index() {
       );
     }
     getCurrentLocation();
-  }, [WEATHER_API_KEY]);
+  }, [WEATHER_API_KEY, setSunrise, setSunset]);
 
   const navigation = useNavigation();
 
@@ -117,8 +131,8 @@ export default function Index() {
 
   const clouds = [803, 804];
 
-  // Get Weather Icons based on weather code
-  const getWeatherIcons = (weatherId: number, size: number) => {
+  // Get Current Weather Icons based on weather code
+  const getCurrentWeatherIcons = (weatherId: number, size: number) => {
     if (storm?.includes(weatherId)) {
       return (
         <Ionicons
@@ -183,6 +197,96 @@ export default function Index() {
     }
   };
 
+  // Get Weahter Icons by forcast time
+  const getWeatherIconsByTime = (
+    weatherId: number,
+    hours: number,
+    size: number,
+    sunset: any,
+    sunrise: any
+  ) => {
+    console.log(sunset);
+    console.log(sunrise);
+    if (storm?.includes(weatherId)) {
+      return (
+        <Ionicons
+          name="thunderstorm-outline"
+          size={size}
+          color={theme === "light" ? "black" : "white"}
+        />
+      );
+    } else if (drizzle?.includes(weatherId) || rain?.includes(weatherId)) {
+      return (
+        <Ionicons
+          name="rainy-outline"
+          size={size}
+          color={theme === "light" ? "black" : "white"}
+        />
+      );
+    } else if (snow?.includes(weatherId)) {
+      return (
+        <Ionicons
+          name="snow-outline"
+          size={size}
+          color={theme === "light" ? "black" : "white"}
+        />
+      );
+    } else if (mist?.includes(weatherId)) {
+      return (
+        <MaterialCommunityIcons
+          name="weather-fog"
+          size={size}
+          color={theme === "light" ? "black" : "white"}
+        />
+      );
+    } else if (clear?.includes(weatherId)) {
+      const clear =
+        hours >= sunset || hours < sunrise ? (
+          <Ionicons
+            name="moon-outline"
+            size={size}
+            color={theme === "light" ? "black" : "white"}
+          />
+        ) : (
+          <Fontisto
+            name="day-sunny"
+            size={size}
+            color={theme === "light" ? "black" : "white"}
+          />
+        );
+      return clear;
+    } else if (fewClouds?.includes(weatherId)) {
+      const fewClouds =
+        hours >= sunset || hours < sunrise ? (
+          <Image
+            source={require("../assets/images/day-cloudy.png")}
+            style={{
+              width: "100%",
+              height: "100%",
+              resizeMode: "contain",
+              tintColor: theme === "light" ? "black" : "white",
+            }}
+          />
+        ) : (
+          <Ionicons
+            name="cloudy-night-outline"
+            size={size}
+            color={theme === "light" ? "black" : "white"}
+          />
+        );
+
+      return fewClouds;
+    } else if (clouds?.includes(weatherId)) {
+      return (
+        <Ionicons
+          name="cloud-outline"
+          size={size}
+          color={theme === "light" ? "black" : "white"}
+        />
+      );
+    }
+  };
+
   // weatherID value
   const weatherId = currentWeather?.weather?.length
     ? currentWeather.weather[0].id
@@ -197,7 +301,7 @@ export default function Index() {
   const averageTemp = Math.round(
     hourlyWeather?.reduce((acc: number, items: any) => {
       return acc + (items?.main?.temp ?? 0);
-    }, 0) / 8
+    }, 0) / hourlyWeather.length
   );
 
   return (
@@ -215,7 +319,7 @@ export default function Index() {
           <View className="justify-center mt-8">
             {/* Weather Icon */}
             <View className="w-[260px] h-[260px] items-center justify-center">
-              {getWeatherIcons(weatherId ? weatherId : 0, 260)}
+              {getCurrentWeatherIcons(weatherId ? weatherId : 0, 260)}
             </View>
             <Text
               className={`text-[130px] font-medium ${theme === "light" ? "text-black" : "text-white"}`}
@@ -262,12 +366,49 @@ export default function Index() {
 
             {/* subTitle */}
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[14px] mt-6`}
+              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[14px] my-7`}
             >
               The average temperature will be {averageTemp}°C.
             </Text>
 
-            <ScrollView className="flex-row">{}</ScrollView>
+            <ScrollView horizontal={true} className="mb-[200px]">
+              {hourlyWeather?.map((v: any, i: number) => {
+                /** Time format */
+                const hours = new Date(v?.dt_txt).getHours();
+                const period = hours >= 12 ? "pm" : "am";
+
+                const formattedTime = `${hours % 12 || 12}${period}`;
+
+                /** Weather icon */
+                const weatherIcons =
+                  v?.weather?.length > 0 ? v?.weather[0]?.id : null;
+
+                return (
+                  <View key={i} className="mx-3">
+                    <Text
+                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold `}
+                    >
+                      {formattedTime}
+                    </Text>
+                    <View className="w-[35px] h-[35px] my-3 flex items-center justify-center">
+                      {getWeatherIconsByTime(
+                        weatherIcons,
+                        hours,
+                        35,
+                        sunset,
+                        sunrise
+                      )}
+                    </View>
+
+                    <Text
+                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-center text-[17px]`}
+                    >
+                      {Math.round(v?.main?.temp)}°
+                    </Text>
+                  </View>
+                );
+              })}
+            </ScrollView>
           </View>
         </Fragment>
       ) : (
