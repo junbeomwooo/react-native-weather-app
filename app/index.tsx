@@ -9,13 +9,13 @@ import {
   View,
 } from "react-native";
 
-import { Image } from "expo-image";
 import * as Location from "expo-location";
 import { Fragment, useContext, useEffect, useState } from "react";
 
 import { useNavigation } from "expo-router";
 
 import Feather from "@expo/vector-icons/Feather";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Fontisto from "@expo/vector-icons/Fontisto";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
@@ -175,9 +175,10 @@ export default function Index() {
     } else if (fewClouds?.includes(weatherId)) {
       const fewClouds =
         theme === "light" ? (
-          <Image
-            source={require("../assets/images/day-cloudy.png")}
-            style={{ width: "100%", height: "100%", resizeMode: "contain" }}
+          <Ionicons
+            name="partly-sunny-outline"
+            size={size}
+            color={theme === "light" ? "black" : "white"}
           />
         ) : (
           <Ionicons name="cloudy-night-outline" size={size} color="white" />
@@ -265,14 +266,11 @@ export default function Index() {
           />
         ) : (
           // when its before sunset
-          <Image
-            source={require("../assets/images/day-cloudy.png")}
-            style={{
-              width: "100%",
-              height: "100%",
-              resizeMode: "contain",
-              tintColor: theme === "light" ? "black" : "white",
-            }}
+          // when its before sunset
+          <Ionicons
+            name="partly-sunny-outline"
+            size={size}
+            color={theme === "light" ? "black" : "white"}
           />
         );
       return fewClouds;
@@ -312,9 +310,11 @@ export default function Index() {
   const sunsetDate = new Date(currentWeather?.sys?.sunset * 1000);
   const sunset = sunsetDate.getHours();
 
+  console.log(currentWeather);
+
   return (
     <ScrollView
-      className="flex-1 px-8"
+      className="flex-1 px-10"
       style={{ width: WINDOW_WIDTH }}
       contentContainerStyle={{
         justifyContent: "center",
@@ -486,6 +486,98 @@ export default function Index() {
             className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
           />
 
+          {/* feels like, humidity */}
+          <View className="flex-row justify-between w-full">
+            <View
+              className={`w-[150px] h-[140px] border-[2px] rounded-2xl ${theme === "light" ? " border-black" : "border-white"}`}
+            >
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[16px] mt-6 mx-4`}
+              >
+                Feels like
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px] mt-5 mx-4`}
+              >
+                {Math.round(currentWeather?.main?.feels_like)}°
+              </Text>
+            </View>
+
+            <View
+              className={`w-[150px] h-[140px] border-[2px] rounded-2xl ${theme === "light" ? " border-black" : "border-white"}`}
+            >
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[16px] mt-6 mx-4`}
+              >
+                Humidity
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px] mt-5 mx-4`}
+              >
+                {currentWeather?.main?.humidity}%
+              </Text>
+            </View>
+          </View>
+
+          {/* wind */}
+          <View
+            className={`w-full h-[160px] border-[2px] rounded-2xl ${theme === "light" ? " border-black" : "border-white"} mt-14 relative`}
+          >
+            <Text
+              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[16px] mt-6 mx-4`}
+            >
+              Wind
+            </Text>
+
+            <Text
+              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px] mt-7 mx-4`}
+            >
+              {currentWeather?.wind?.speed} m/s
+            </Text>
+            <View
+              className={`w-[85px] h-[85px] absolute right-[8%] top-1/2 -translate-y-1/2 rounded-full border-[2px] ${theme === "light" ? "border-black" : "border-white"}`}
+            >
+              <View className="w-full h-full relative flex justify-center items-center">
+                <Text
+                  className={`absolute top-[-20px] left-1/2 -translate-x-1/2 font-semibold text-[11px] ${theme === "light" ? "text-black" : "text-white"}`}
+                >
+                  N
+                </Text>
+                <Text
+                  className={`absolute bottom-[-20px] left-1/2 -translate-x-1/2 font-semibold text-[11px] ${theme === "light" ? "text-black" : "text-white"}`}
+                >
+                  S
+                </Text>
+                <Text
+                  className={`absolute left-[-20px] top-1/2 -translate-y-1/2 font-semibold text-[11px] ${theme === "light" ? "text-black" : "text-white"}`}
+                >
+                  W
+                </Text>
+                <Text
+                  className={`absolute right-[-20px] top-1/2 -translate-y-1/2 font-semibold text-[11px] ${theme === "light" ? "text-black" : "text-white"}`}
+                >
+                  E
+                </Text>
+                <FontAwesome
+                  name="location-arrow"
+                  size={30}
+                  color={theme === "light" ? "black" : "white"}
+                  style={{
+                    transform: [
+                      { rotate: `${currentWeather?.wind?.deg + 180}deg` },
+                    ],
+                  }}
+                />
+              </View>
+            </View>
+          </View>
+
+
+          {/* Hr */}
+          <View
+            className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
+          />
+
           {/* Sunrise, Sunset */}
           <View className="flex-row justify-between w-full">
             {/* Sunrise */}
@@ -530,7 +622,91 @@ export default function Index() {
           </View>
 
           {/* Details */}
-          <View className="mt-10"></View>
+          <View className="mt-10 w-full mb-20">
+            {/* feels like */}
+            <View className="flex-row justify-between ">
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                Feels like
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                {Math.round(currentWeather?.main?.feels_like)}°
+              </Text>
+            </View>
+
+            {/* Humidity */}
+            <View className="flex-row justify-between mt-4">
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                Humidity
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                {currentWeather?.main?.humidity}%
+              </Text>
+            </View>
+
+                        {/* Wind speed */}
+            <View className="flex-row justify-between mt-4">
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                Wind speed
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                {currentWeather?.wind?.speed} m/s
+              </Text>
+            </View>
+
+            {/* Pressure */}
+            <View className="flex-row justify-between mt-4">
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                Pressure
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                {currentWeather?.main?.pressure}
+              </Text>
+            </View>
+
+            {/* Ground level */}
+            <View className="flex-row justify-between mt-4">
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                Ground level
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                {currentWeather?.main?.grnd_level}
+              </Text>
+            </View>
+
+            {/* Sea level */}
+            <View className="flex-row justify-between mt-4">
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                Sea level
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+              >
+                {currentWeather?.main?.sea_level}
+              </Text>
+            </View>
+          </View>
         </Fragment>
       ) : (
         /** Loading Bar (Indicator) */
