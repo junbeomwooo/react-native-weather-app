@@ -310,7 +310,9 @@ export default function Index() {
   const sunsetDate = new Date(currentWeather?.sys?.sunset * 1000);
   const sunset = sunsetDate.getHours();
 
-  console.log(currentWeather);
+  console.log(`current wetather ::: ${currentWeather}`);
+  console.log(`daily weather ::: ${dailyWeather.length}`);
+  console.log(`hourly weather ::: ${hourlyWeather.length}`);
 
   return (
     <ScrollView
@@ -321,7 +323,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      {currentWeather ? (
+      {currentWeather && dailyWeather.length > 0 && hourlyWeather.length > 0 ? (
         <Fragment>
           {/* Current weather */}
           <View className="justify-center mt-14">
@@ -330,7 +332,9 @@ export default function Index() {
               {getCurrentWeatherIcons(weatherId ? weatherId : 0, 260)}
             </View>
             <Text
-              className={`text-[130px] font-medium ${theme === "light" ? "text-black" : "text-white"}`}
+              className={`text-[130px] font-medium ${
+                theme === "light" ? "text-black" : "text-white"
+              }`}
             >
               {/* Current temp */}
               {Math.round(currentWeather?.main?.temp)}°
@@ -338,7 +342,9 @@ export default function Index() {
 
             {/* Weather description */}
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} text-[35px] font-medium mt-[-10px]`}
+              className={`${
+                theme === "light" ? "text-black" : "text-white"
+              } text-[35px] font-medium mt-[-10px]`}
             >
               {weatherMain}
             </Text>
@@ -346,12 +352,16 @@ export default function Index() {
             {/* High temp, Low, temp */}
             <View className="flex-row gap-2 mt-3">
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[20px] font-medium`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[20px] font-medium`}
               >
                 H:{Math.round(currentWeather?.main?.temp_max)}°
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[20px] font-medium`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[20px] font-medium`}
               >
                 L:{Math.round(currentWeather?.main?.temp_min)}°
               </Text>
@@ -360,21 +370,27 @@ export default function Index() {
 
           {/* Hr */}
           <View
-            className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
+            className={` ${
+              theme === "light" ? "bg-black" : "bg-white"
+            } w-full h-[1px] my-14`}
           />
 
           {/* Hourly forecast */}
           <View className="w-full">
             {/* title */}
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} font-bold text-[18px]`}
+              className={`${
+                theme === "light" ? "text-black" : "text-white"
+              } font-bold text-[18px]`}
             >
               Hourly Forecast
             </Text>
 
             {/* subTitle */}
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[14px] my-7`}
+              className={`${
+                theme === "light" ? "text-black" : "text-white"
+              } font-semibold text-[14px] my-7`}
             >
               The average temperature will be {averageTemp}°C.
             </Text>
@@ -394,7 +410,9 @@ export default function Index() {
                 return (
                   <View key={i} className="mx-3">
                     <Text
-                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-center`}
+                      className={`${
+                        theme === "light" ? "text-black" : "text-white"
+                      } font-semibold text-center`}
                     >
                       {formattedTime}
                     </Text>
@@ -409,7 +427,9 @@ export default function Index() {
                     </View>
 
                     <Text
-                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-center text-[17px]`}
+                      className={`${
+                        theme === "light" ? "text-black" : "text-white"
+                      } font-semibold text-center text-[17px]`}
                     >
                       {Math.round(v?.main?.temp)}°
                     </Text>
@@ -421,21 +441,27 @@ export default function Index() {
 
           {/* Hr */}
           <View
-            className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
+            className={` ${
+              theme === "light" ? "bg-black" : "bg-white"
+            } w-full h-[1px] my-14`}
           />
 
           {/* Daily forecast */}
           <View className="w-full">
             {/* title */}
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} font-bold text-[18px]`}
+              className={`${
+                theme === "light" ? "text-black" : "text-white"
+              } font-bold text-[18px]`}
             >
               Daily Forecast
             </Text>
 
             {/* subTitle */}
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[14px] my-7`}
+              className={`${
+                theme === "light" ? "text-black" : "text-white"
+              } font-semibold text-[14px] my-7`}
             >
               Temperature information for the next 5 days starting today.
             </Text>
@@ -456,7 +482,9 @@ export default function Index() {
                 return (
                   <View key={i} className="mx-3">
                     <Text
-                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-center`}
+                      className={`${
+                        theme === "light" ? "text-black" : "text-white"
+                      } font-semibold text-center`}
                     >
                       {day}
                     </Text>
@@ -471,7 +499,9 @@ export default function Index() {
                     </View>
 
                     <Text
-                      className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-center text-[17px]`}
+                      className={`${
+                        theme === "light" ? "text-black" : "text-white"
+                      } font-semibold text-center text-[17px]`}
                     >
                       {Math.round(v?.main?.temp)}°
                     </Text>
@@ -483,36 +513,50 @@ export default function Index() {
 
           {/* Hr */}
           <View
-            className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
+            className={` ${
+              theme === "light" ? "bg-black" : "bg-white"
+            } w-full h-[1px] my-14`}
           />
 
           {/* feels like, humidity */}
           <View className="flex-row justify-between w-full">
             <View
-              className={`w-[150px] h-[140px] border-[2px] rounded-2xl ${theme === "light" ? " border-black" : "border-white"}`}
+              className={`w-[150px] h-[140px] border-[2px] rounded-2xl ${
+                theme === "light" ? " border-black" : "border-white"
+              }`}
             >
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[16px] mt-6 mx-4`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-[16px] mt-6 mx-4`}
               >
                 Feels like
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px] mt-5 mx-4`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-[40px] mt-5 mx-4`}
               >
                 {Math.round(currentWeather?.main?.feels_like)}°
               </Text>
             </View>
 
             <View
-              className={`w-[150px] h-[140px] border-[2px] rounded-2xl ${theme === "light" ? " border-black" : "border-white"}`}
+              className={`w-[150px] h-[140px] border-[2px] rounded-2xl ${
+                theme === "light" ? " border-black" : "border-white"
+              }`}
             >
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[16px] mt-6 mx-4`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-[16px] mt-6 mx-4`}
               >
                 Humidity
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px] mt-5 mx-4`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-[40px] mt-5 mx-4`}
               >
                 {currentWeather?.main?.humidity}%
               </Text>
@@ -521,40 +565,56 @@ export default function Index() {
 
           {/* wind */}
           <View
-            className={`w-full h-[160px] border-[2px] rounded-2xl ${theme === "light" ? " border-black" : "border-white"} mt-14 relative`}
+            className={`w-full h-[160px] border-[2px] rounded-2xl ${
+              theme === "light" ? " border-black" : "border-white"
+            } mt-14 relative`}
           >
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[16px] mt-6 mx-4`}
+              className={`${
+                theme === "light" ? "text-black" : "text-white"
+              } font-semibold text-[16px] mt-6 mx-4`}
             >
               Wind
             </Text>
 
             <Text
-              className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px] mt-7 mx-4`}
+              className={`${
+                theme === "light" ? "text-black" : "text-white"
+              } font-semibold text-[40px] mt-7 mx-4`}
             >
               {currentWeather?.wind?.speed} m/s
             </Text>
             <View
-              className={`w-[85px] h-[85px] absolute right-[8%] top-1/2 -translate-y-1/2 rounded-full border-[2px] ${theme === "light" ? "border-black" : "border-white"}`}
+              className={`w-[85px] h-[85px] absolute right-[8%] top-1/2 -translate-y-1/2 rounded-full border-[2px] ${
+                theme === "light" ? "border-black" : "border-white"
+              }`}
             >
               <View className="w-full h-full relative flex justify-center items-center">
                 <Text
-                  className={`absolute top-[-20px] left-1/2 -translate-x-1/2 font-semibold text-[11px] ${theme === "light" ? "text-black" : "text-white"}`}
+                  className={`absolute top-[-20px] left-1/2 -translate-x-1/2 font-semibold text-[11px] ${
+                    theme === "light" ? "text-black" : "text-white"
+                  }`}
                 >
                   N
                 </Text>
                 <Text
-                  className={`absolute bottom-[-20px] left-1/2 -translate-x-1/2 font-semibold text-[11px] ${theme === "light" ? "text-black" : "text-white"}`}
+                  className={`absolute bottom-[-20px] left-1/2 -translate-x-1/2 font-semibold text-[11px] ${
+                    theme === "light" ? "text-black" : "text-white"
+                  }`}
                 >
                   S
                 </Text>
                 <Text
-                  className={`absolute left-[-20px] top-1/2 -translate-y-1/2 font-semibold text-[11px] ${theme === "light" ? "text-black" : "text-white"}`}
+                  className={`absolute left-[-20px] top-1/2 -translate-y-1/2 font-semibold text-[11px] ${
+                    theme === "light" ? "text-black" : "text-white"
+                  }`}
                 >
                   W
                 </Text>
                 <Text
-                  className={`absolute right-[-20px] top-1/2 -translate-y-1/2 font-semibold text-[11px] ${theme === "light" ? "text-black" : "text-white"}`}
+                  className={`absolute right-[-20px] top-1/2 -translate-y-1/2 font-semibold text-[11px] ${
+                    theme === "light" ? "text-black" : "text-white"
+                  }`}
                 >
                   E
                 </Text>
@@ -572,10 +632,11 @@ export default function Index() {
             </View>
           </View>
 
-
           {/* Hr */}
           <View
-            className={` ${theme === "light" ? "bg-black" : "bg-white"} w-full h-[1px] my-14`}
+            className={` ${
+              theme === "light" ? "bg-black" : "bg-white"
+            } w-full h-[1px] my-14`}
           />
 
           {/* Sunrise, Sunset */}
@@ -588,12 +649,16 @@ export default function Index() {
                 color={theme === "light" ? "black" : "white"}
               />
               <Text
-                className={`text-[20px] ${theme === "light" ? "text-black" : "text-white"} font-semibold text-[20px] my-6`}
+                className={`text-[20px] ${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-[20px] my-6`}
               >
                 Sunrise
               </Text>
               <Text
-                className={`text-[20px] ${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px]`}
+                className={`text-[20px] ${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-[40px]`}
               >
                 {sunrise % 12 || 12}
                 {sunrise >= 12 ? "PM" : "AM"}
@@ -608,12 +673,16 @@ export default function Index() {
                 color={theme === "light" ? "black" : "white"}
               />
               <Text
-                className={`text-[20px] ${theme === "light" ? "text-black" : "text-white"} font-semibold text-[20px] my-6`}
+                className={`text-[20px] ${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-[20px] my-6`}
               >
                 Sunset
               </Text>
               <Text
-                className={`text-[20px] ${theme === "light" ? "text-black" : "text-white"} font-semibold text-[40px]`}
+                className={`text-[20px] ${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-[40px]`}
               >
                 {sunset % 12 || 12}
                 {sunset >= 12 ? "PM" : "AM"}
@@ -626,12 +695,16 @@ export default function Index() {
             {/* feels like */}
             <View className="flex-row justify-between ">
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 Feels like
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 {Math.round(currentWeather?.main?.feels_like)}°
               </Text>
@@ -640,26 +713,34 @@ export default function Index() {
             {/* Humidity */}
             <View className="flex-row justify-between mt-4">
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 Humidity
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 {currentWeather?.main?.humidity}%
               </Text>
             </View>
 
-                        {/* Wind speed */}
+            {/* Wind speed */}
             <View className="flex-row justify-between mt-4">
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 Wind speed
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 {currentWeather?.wind?.speed} m/s
               </Text>
@@ -668,12 +749,16 @@ export default function Index() {
             {/* Pressure */}
             <View className="flex-row justify-between mt-4">
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 Pressure
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 {currentWeather?.main?.pressure}
               </Text>
@@ -682,12 +767,16 @@ export default function Index() {
             {/* Ground level */}
             <View className="flex-row justify-between mt-4">
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 Ground level
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 {currentWeather?.main?.grnd_level}
               </Text>
@@ -696,12 +785,16 @@ export default function Index() {
             {/* Sea level */}
             <View className="flex-row justify-between mt-4">
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 Sea level
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} text-[15px] font-semibold`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } text-[15px] font-semibold`}
               >
                 {currentWeather?.main?.sea_level}
               </Text>
