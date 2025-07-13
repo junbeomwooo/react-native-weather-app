@@ -17,7 +17,6 @@ export default function RootLayout() {
     // Currnet hour
     const nowHour = new Date()?.getHours();
 
-
     console.log(
       ` sunrise: ${sunrise} , sunset: ${sunset} , nowHours: ${nowHour}`
     );
@@ -49,6 +48,8 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="+not-found" />
+
+          <Stack.Screen name="city" />
         </Stack>
         <StatusBar style={theme === "light" ? "dark" : "light"} />
       </SafeAreaProvider>

@@ -12,6 +12,7 @@ import {
 import * as Location from "expo-location";
 import { Fragment, useContext, useEffect, useState } from "react";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "expo-router";
 
 import Feather from "@expo/vector-icons/Feather";
@@ -39,6 +40,39 @@ export default function Index() {
       { text: "OK", onPress: () => console.log("OK Pressed") },
     ]);
 
+  /**  To save in to Async storage */
+  const saveIntoAsyncStorage = async (params: any) => {
+    const address = {
+      ...params,
+      myLocation: true,
+      timestamp: Date.now(),
+    };
+
+    try {
+      const existing = await AsyncStorage.getItem("location");
+
+      let data;
+
+      if (existing) {
+        // If there is data in storage,
+        const parsed = JSON.parse(existing);
+
+        // Remove data array which has myLocation value
+        const filtered = parsed.filter((item: any) => !item.myLocation);
+
+        data = [...filtered, address];
+
+      } else {
+        //  If there is no data in storage, just save a new data
+        data = [address];
+      }
+
+      await AsyncStorage.setItem("location", JSON.stringify(data));
+    } catch (err) {
+      console.error(`Failed to save location data to storage : ${err}`);
+    }
+  };
+
   useEffect(() => {
     async function getCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -60,6 +94,8 @@ export default function Index() {
       });
 
       setLocation({ country: address[0]?.country, city: address[0]?.city });
+
+      saveIntoAsyncStorage(address[0]);
 
       const [current, hourly] = await Promise.all([
         fetch(
@@ -108,6 +144,7 @@ export default function Index() {
 
   const navigation = useNavigation();
 
+  // to set up dynamic header title
   useEffect(() => {
     navigation.setOptions({ title: location?.city });
   }, [navigation, location?.city]);
@@ -309,10 +346,6 @@ export default function Index() {
   // Sunset hour
   const sunsetDate = new Date(currentWeather?.sys?.sunset * 1000);
   const sunset = sunsetDate.getHours();
-
-  console.log(`current wetather ::: ${currentWeather}`);
-  console.log(`daily weather ::: ${dailyWeather.length}`);
-  console.log(`hourly weather ::: ${hourlyWeather.length}`);
 
   return (
     <ScrollView
