@@ -61,7 +61,6 @@ export default function Index() {
         const filtered = parsed.filter((item: any) => !item.myLocation);
 
         data = [...filtered, address];
-
       } else {
         //  If there is no data in storage, just save a new data
         data = [address];
@@ -95,8 +94,6 @@ export default function Index() {
 
       setLocation({ country: address[0]?.country, city: address[0]?.city });
 
-      saveIntoAsyncStorage(address[0]);
-
       const [current, hourly] = await Promise.all([
         fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
@@ -110,6 +107,8 @@ export default function Index() {
         current.json(),
         hourly.json(),
       ]);
+
+      saveIntoAsyncStorage(currentWeatherJSON);
 
       // set Sunrise, Sunset time for React Context
 

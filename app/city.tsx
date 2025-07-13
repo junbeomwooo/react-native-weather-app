@@ -1,7 +1,7 @@
 import { ThemeContext } from "@/context/ThemeContext";
 
 import { Fragment, useContext, useEffect, useState } from "react";
-import { Dimensions, ScrollView, Text, TextInput } from "react-native";
+import { Dimensions, ScrollView, Text, TextInput, View } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -15,10 +15,16 @@ export default function Index() {
   useEffect(() => {
     const getData = async () => {
       const address = await AsyncStorage.getItem("location");
-      console.log(address);
+
+      if (address) {
+        const parsedData = JSON.parse(address);
+        setCities(parsedData);
+      }
     };
     getData();
   }, []);
+
+  console.log(cities);
 
   return (
     <ScrollView
@@ -44,8 +50,34 @@ export default function Index() {
         placeholder="Search for a city or country"
       />
 
-      {cities?.length > 0 ? (<Fragment></Fragment>):(<Fragment></Fragment>)}
-      
+      {cities?.length > 0 ? (
+        cities?.map((v: any, i: number) => {
+          // Sunrise hour
+          const sunriseDate = new Date(v?.sys?.sunrise * 1000);
+          const sunriseHours = sunriseDate.getHours();
+
+          // Sunset hour
+          const sunsetDate = new Date(v?.sys?.sunset * 1000);
+          const sunsetHours = sunsetDate.getHours();
+
+          // now time
+          const now = new Date(v?.timestamp).getHours();
+
+        
+          return (
+            <View
+              className={`w-full h-36 border-[2px] mt-10 rounded-2xl ${
+                theme === "light" ? "border-black" : "border-white"
+              }`}
+              key={i}
+            >
+              <Text>Hello</Text>
+            </View>
+          );
+        })
+      ) : (
+        <Fragment></Fragment>
+      )}
     </ScrollView>
   );
 }
