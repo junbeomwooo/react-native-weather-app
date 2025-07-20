@@ -41,9 +41,10 @@ export default function Index() {
     ]);
 
   /**  To save in to Async storage */
-  const saveIntoAsyncStorage = async (params: any) => {
+  const saveIntoAsyncStorage = async (params: any , city:string) => {
     const address = {
       ...params,
+      name:city,
       myLocation: true,
       timestamp: Date.now(),
     };
@@ -66,6 +67,7 @@ export default function Index() {
         data = [address];
       }
 
+      // Set into storage
       await AsyncStorage.setItem("location", JSON.stringify(data));
     } catch (err) {
       console.error(`Failed to save location data to storage : ${err}`);
@@ -108,7 +110,7 @@ export default function Index() {
         hourly.json(),
       ]);
 
-      saveIntoAsyncStorage(currentWeatherJSON);
+      saveIntoAsyncStorage(currentWeatherJSON , address[0]?.city);
 
       // set Sunrise, Sunset time for React Context
 

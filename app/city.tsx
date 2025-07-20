@@ -12,6 +12,13 @@ export default function Index() {
 
   const [cities, setCities] = useState([]);
 
+  const capitalizeDesc = (desc: string) => {
+    return desc
+      ?.split(" ")
+      ?.map((v) => v?.charAt(0)?.toUpperCase() + v?.slice(1))
+      .join(" ");
+  };
+
   useEffect(() => {
     const getData = async () => {
       const address = await AsyncStorage.getItem("location");
@@ -38,7 +45,7 @@ export default function Index() {
       <Text
         className={`${
           theme === "light" ? "text-black" : "text-white"
-        } text-[45px] font-semibold text-start w-full`}
+        } text-[40px] font-bold text-start w-full`}
       >
         Weather
       </Text>
@@ -63,15 +70,67 @@ export default function Index() {
           // now time
           const now = new Date(v?.timestamp).getHours();
 
-        
+          console.log(sunriseHours);
+          console.log(sunsetHours);
+          console.log(now);
+          console.log(v);
+
+          const isNight = now >= sunsetHours || now < sunriseHours;
+
           return (
             <View
-              className={`w-full h-36 border-[2px] mt-10 rounded-2xl ${
-                theme === "light" ? "border-black" : "border-white"
+              className={`w-full h-36 mt-10 rounded-2xl flex-row px-5 py-3 justify-between ${
+                isNight ? "bg-blue-100" : "bg-blue-950"
               }`}
               key={i}
             >
-              <Text>Hello</Text>
+              <View className="justify-between">
+                <View>
+                  <Text
+                    className={`${
+                      isNight ? "text-black" : "text-white"
+                    } font-bold text-[25px]`}
+                  >
+                    {v.name}
+                  </Text>
+                  <Text
+                    className={`${
+                      isNight ? "text-black" : "text-white"
+                    } font-semibold text-[12px]`}
+                  >
+                    {v?.myLocation ? "My Location" : ""}
+                  </Text>
+                </View>
+                <View>
+                  <Text
+                    className={`${
+                      isNight ? "text-black" : "text-white"
+                    } font-medium text-[12px]`}
+                  >
+                    {capitalizeDesc(v?.weather[0]?.description)}
+                  </Text>
+                </View>
+              </View>
+              <View className="justify-between">
+                <View>
+                  <Text
+                    className={`${
+                      isNight ? "text-black" : "text-white"
+                    } font-bold text-[40px]`}
+                  >
+                    {Math.round(v?.main?.temp)}°
+                  </Text>
+                </View>
+                <View>
+                  <Text
+                    className={`${
+                      isNight ? "text-black" : "text-white"
+                    } font-medium text-[12px]`}
+                  >
+                    {capitalizeDesc(v?.weather[0]?.description)}
+                  </Text>
+                </View>
+              </View>
             </View>
           );
         })
