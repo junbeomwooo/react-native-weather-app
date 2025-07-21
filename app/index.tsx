@@ -110,7 +110,8 @@ export default function Index() {
         hourly.json(),
       ]);
 
-      saveIntoAsyncStorage(currentWeatherJSON , address[0]?.city);
+      const city = address[0]?.city ? address[0]?.city : ""
+      saveIntoAsyncStorage(currentWeatherJSON , city);
 
       // set Sunrise, Sunset time for React Context
 

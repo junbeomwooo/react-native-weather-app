@@ -1,14 +1,24 @@
 import { ThemeContext } from "@/context/ThemeContext";
 
-import { Fragment, useContext, useEffect, useState } from "react";
-import { Dimensions, ScrollView, Text, TextInput, View } from "react-native";
+import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import {
+  Animated,
+  Dimensions,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Index() {
   const { theme } = useContext(ThemeContext);
 
   const WINDOW_WIDTH = Dimensions.get("window").width;
+    const WINDOW_HEIGHT = Dimensions.get("window").width;
 
   const [cities, setCities] = useState([]);
 
@@ -31,7 +41,26 @@ export default function Index() {
     getData();
   }, []);
 
-  console.log(cities);
+  /** Linear Gradient Animation */
+
+  const translate = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(translate, {
+          toValue: { x: -WINDOW_WIDTH / 2, y: -WINDOW_HEIGHT / 4 },
+          duration: 5000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(translate, {
+          toValue: { x: 0, y: 0 },
+          duration: 5000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, [WINDOW_HEIGHT, translate, WINDOW_WIDTH]);
 
   return (
     <ScrollView
@@ -76,26 +105,50 @@ export default function Index() {
           console.log(v);
 
           const isNight = now >= sunsetHours || now < sunriseHours;
-
           return (
             <View
-              className={`w-full h-36 mt-10 rounded-2xl flex-row px-5 py-3 justify-between ${
-                isNight ? "bg-blue-100" : "bg-blue-950"
-              }`}
+              className="w-full h-36 mt-10 rounded-2xl flex-row px-5 py-3 justify-between"
               key={i}
             >
+              {/* Gradient 배경만 이동 */}
+              <View className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden rounded-2xl ">
+                <Animated.View
+                  style={{
+                    width: "300%",
+                    height: "300%",
+                    transform: [
+                      { translateX: translate.x },
+                      { translateY: translate.y },
+                    ],
+                  }}
+                >
+                  <LinearGradient
+                    colors={
+                      isNight
+                        ? ["#0a0a3c", "#1a237e", "#3f51b5", "#140478", "black"]
+                        : ["#87ceeb", "#a0d8ef", "#fef3b3", "#c1e1c1"]
+                    }
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                </Animated.View>
+              </View>
               <View className="justify-between">
                 <View>
                   <Text
                     className={`${
-                      isNight ? "text-black" : "text-white"
+                      isNight ? "text-white" : "text-black"
                     } font-bold text-[25px]`}
                   >
                     {v.name}
                   </Text>
                   <Text
                     className={`${
-                      isNight ? "text-black" : "text-white"
+                      isNight ? "text-white" : "text-black"
                     } font-semibold text-[12px]`}
                   >
                     {v?.myLocation ? "My Location" : ""}
@@ -104,7 +157,7 @@ export default function Index() {
                 <View>
                   <Text
                     className={`${
-                      isNight ? "text-black" : "text-white"
+                      isNight ? "text-white" : "text-black"
                     } font-medium text-[12px]`}
                   >
                     {capitalizeDesc(v?.weather[0]?.description)}
@@ -115,8 +168,8 @@ export default function Index() {
                 <View>
                   <Text
                     className={`${
-                      isNight ? "text-black" : "text-white"
-                    } font-bold text-[40px]`}
+                      isNight ? "text-white" : "text-black"
+                    } font-bold text-[40px] text-right`}
                   >
                     {Math.round(v?.main?.temp)}°
                   </Text>
@@ -124,7 +177,7 @@ export default function Index() {
                 <View>
                   <Text
                     className={`${
-                      isNight ? "text-black" : "text-white"
+                      isNight ? "text-white" : "text-black"
                     } font-medium text-[12px]`}
                   >
                     {capitalizeDesc(v?.weather[0]?.description)}
