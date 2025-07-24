@@ -41,10 +41,10 @@ export default function Index() {
     ]);
 
   /**  To save in to Async storage */
-  const saveIntoAsyncStorage = async (params: any , city:string) => {
+  const saveIntoAsyncStorage = async (params: any, city: string) => {
     const address = {
       ...params,
-      name:city,
+      name: city,
       myLocation: true,
       timestamp: Date.now(),
     };
@@ -89,13 +89,6 @@ export default function Index() {
         coords: { latitude, longitude },
       } = await Location.getCurrentPositionAsync({ accuracy: 5 });
 
-      const address = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude,
-      });
-
-      setLocation({ country: address[0]?.country, city: address[0]?.city });
-
       const [current, hourly] = await Promise.all([
         fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
@@ -104,14 +97,24 @@ export default function Index() {
           `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
         ),
       ]);
+      
+      /** if you want to get location info through Location from expo 
+       *  No need, Because the weather api provide simple location info as well 
+      */
+      //   const address = await Location.reverseGeocodeAsync({
+      //   latitude,
+      //   longitude,
+      // });
 
       const [currentWeatherJSON, hourlyWeatherJSON] = await Promise.all([
         current.json(),
         hourly.json(),
       ]);
 
-      const city = address[0]?.city ? address[0]?.city : ""
-      saveIntoAsyncStorage(currentWeatherJSON , city);
+      const city = currentWeatherJSON?.name ? currentWeatherJSON?.name : "";
+
+      setLocation(city);
+      saveIntoAsyncStorage(currentWeatherJSON, city);
 
       // set Sunrise, Sunset time for React Context
 
@@ -148,8 +151,8 @@ export default function Index() {
 
   // to set up dynamic header title
   useEffect(() => {
-    navigation.setOptions({ title: location?.city });
-  }, [navigation, location?.city]);
+    navigation.setOptions({ title: location });
+  }, [navigation, location]);
 
   /** weahter code list */
 
