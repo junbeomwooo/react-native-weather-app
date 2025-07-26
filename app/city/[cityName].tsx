@@ -20,7 +20,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 import { getCurrentWeatherIcons, getWeatherIconsByTime } from "@/hooks/getWeatherIcons";
 
-export default function Index() {
+export default function City() {
   const { theme, setSunrise, setSunset } = useContext(ThemeContext);
 
   const WINDOW_WIDTH = Dimensions.get("window").width;

@@ -17,7 +17,7 @@ import { useRouter } from "expo-router";
 import major_cities from "@/assets/major_cities_200.json";
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function Index() {
+export default function List() {
   const { theme } = useContext(ThemeContext);
   const router = useRouter();
 
@@ -122,9 +122,11 @@ export default function Index() {
           <FlatList
             data={filterCities}
             renderItem={({ item }) => (
+              <Pressable onPressIn={() => router.push(`/city/${item}`)}>
               <Text className="text-white w-full my-2 mx-4 text-lg">
                 {item}
               </Text>
+              </Pressable>
             )}
             keyExtractor={(item) => item}
           />
@@ -150,7 +152,7 @@ export default function Index() {
               <Pressable
                 className="w-full h-36 mt-6 rounded-2xl flex-row px-5 py-3 justify-between"
                 key={i}
-                onPress={() => router.navigate("/")}
+                onPress={() => router.push("/")}
               >
                 <View className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden rounded-2xl ">
                   <Animated.View

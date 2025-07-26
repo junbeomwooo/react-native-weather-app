@@ -43,7 +43,7 @@ export default function CustomHeader({ title }: { title?: string }) {
         {title}
       </Text>
       {pathname === "/" ? (
-        <Link href="/city">
+        <Link href="/list">
           <Ionicons name="compass-outline" size={28} color={iconColor} />
         </Link>
       ) : (
