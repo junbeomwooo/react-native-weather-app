@@ -32,7 +32,7 @@ export default function CityHeader({
     >
       {/* left */}
 
-      <Pressable onPress={() => router.push("/")} hitSlop={5}>
+      <Pressable onPress={() => router.push("/list")} hitSlop={5}>
         <Ionicons name="chevron-back-sharp" size={24} color={iconColor} />
       </Pressable>
 

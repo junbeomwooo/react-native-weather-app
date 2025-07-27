@@ -1,4 +1,3 @@
-import { ThemeContext } from "@/context/ThemeContext";
 
 import {
   ActivityIndicator,
@@ -9,7 +8,7 @@ import {
 } from "react-native";
 
 import * as Location from "expo-location";
-import { Fragment, useContext, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { useGlobalSearchParams, useNavigation } from "expo-router";
 
@@ -25,7 +24,6 @@ import CityHeader from "@/components/CityHeader";
 import getLocalDayTime from "@/hooks/getLocalDayTime";
 
 export default function City() {
-  const { setSunrise, setSunset } = useContext(ThemeContext);
 
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -66,18 +64,6 @@ export default function City() {
 
       setLocation(city);
 
-      // set Sunrise, Sunset time for React Context
-
-      // Sunrise hour
-      const sunriseDate = new Date(currentWeatherJSON?.sys?.sunrise * 1000);
-      const sunriseHours = sunriseDate.getHours();
-
-      // Sunset hour
-      const sunsetDate = new Date(currentWeatherJSON?.sys?.sunset * 1000);
-      const sunsetHours = sunsetDate.getHours();
-
-      setSunrise(sunriseHours);
-      setSunset(sunsetHours);
 
       // current weather
       setCurrentWeather(currentWeatherJSON);
@@ -95,7 +81,7 @@ export default function City() {
       );
     }
     getCityWeather();
-  }, [WEATHER_API_KEY, seacrhedCity, setSunrise, setSunset]);
+  }, [WEATHER_API_KEY, seacrhedCity]);
 
   const navigation = useNavigation();
 
