@@ -18,7 +18,12 @@ import { useNavigation } from "expo-router";
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-import { getCurrentWeatherIcons, getWeatherIconsByTime } from "@/hooks/getWeatherIcons";
+import {
+  getCurrentWeatherIcons,
+  getWeatherIconsByTime,
+} from "@/hooks/getWeatherIcons";
+
+import getLocalDayTime from "@/hooks/getLocalDayTime";
 
 export default function Index() {
   const { theme, setSunrise, setSunset } = useContext(ThemeContext);
@@ -96,10 +101,10 @@ export default function Index() {
           `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
         ),
       ]);
-      
-      /** if you want to get location info through Location from expo 
-       *  No need, Because the weather api provide simple location info as well 
-      */
+
+      /** if you want to get location info through Location from expo
+       *  No need, Because the weather api provide simple location info as well
+       */
       //   const address = await Location.reverseGeocodeAsync({
       //   latitude,
       //   longitude,
@@ -153,7 +158,6 @@ export default function Index() {
     navigation.setOptions({ title: location });
   }, [navigation, location]);
 
-
   // weatherID value
   const weatherId = currentWeather?.weather?.length
     ? currentWeather.weather[0].id
@@ -171,17 +175,11 @@ export default function Index() {
     }, 0) / hourlyWeather.length
   );
 
-  // Sunrise hour
-  const sunriseDate = new Date(currentWeather?.sys?.sunrise * 1000);
-  const sunrise = sunriseDate.getHours();
-
-  // Sunset hour
-  const sunsetDate = new Date(currentWeather?.sys?.sunset * 1000);
-  const sunset = sunsetDate.getHours();
+  const { sunrise, sunset } = getLocalDayTime(currentWeather);
 
   return (
     <ScrollView
-      className="flex-1 px-10"
+      className={`flex-1 px-10 ${theme === "light" ? "bg-[#fed500]" : "bg-[#080830]"}`}
       style={{ width: WINDOW_WIDTH }}
       contentContainerStyle={{
         justifyContent: "center",
@@ -194,7 +192,7 @@ export default function Index() {
           <View className="justify-center mt-14">
             {/* Weather Icon */}
             <View className="w-[260px] h-[260px] items-center justify-center">
-              {getCurrentWeatherIcons(weatherId ? weatherId : 0, 260 , theme)}
+              {getCurrentWeatherIcons(weatherId ? weatherId : 0, 260, theme)}
             </View>
             <Text
               className={`text-[130px] font-medium ${

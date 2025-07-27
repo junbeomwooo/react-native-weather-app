@@ -29,30 +29,32 @@ export default function RootLayout() {
   }, [sunrise, sunset]);
 
   return (
-    <ThemeContext.Provider
-      value={{
-        theme: theme,
-        sunrise: sunrise,
-        sunset: sunset,
-        setSunrise: setSunrise,
-        setSunset: setSunset,
-      }}
-    >
-      <SafeAreaProvider>
+    <SafeAreaProvider>
+      <ThemeContext.Provider
+        value={{
+          theme: theme,
+          sunrise: sunrise,
+          sunset: sunset,
+          setSunrise: setSunrise,
+          setSunset: setSunset,
+        }}
+      >
         <Stack
           screenOptions={{
-            header: (props) => <CustomHeader title={props.options.title} />,
-            contentStyle: {
-              backgroundColor: theme === "light" ? "#fed500" : "#080830",
+            header: (props) => {
+              return <CustomHeader title={props.options.title} />;
             },
+            // contentStyle: {
+            //   backgroundColor: theme === "light" ? "#fed500" : "#080830",
+            // },
           }}
         >
+          <Stack.Screen name="list" />
+          <Stack.Screen name="city/[cityName]" options={{ headerShown:false}} />
           <Stack.Screen name="+not-found" />
-
-          <Stack.Screen name="city" />
         </Stack>
         <StatusBar style={theme === "light" ? "dark" : "light"} />
-      </SafeAreaProvider>
-    </ThemeContext.Provider>
+      </ThemeContext.Provider>
+    </SafeAreaProvider>
   );
 }

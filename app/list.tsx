@@ -17,6 +17,8 @@ import { useRouter } from "expo-router";
 import major_cities from "@/assets/major_cities_200.json";
 import { LinearGradient } from "expo-linear-gradient";
 
+import getLocalDayTime from "@/hooks/getLocalDayTime";
+
 export default function List() {
   const { theme } = useContext(ThemeContext);
   const router = useRouter();
@@ -46,8 +48,6 @@ export default function List() {
     };
     getData();
   }, []);
-
-  console.log(cities);
 
   /** Auto Complete  */
 
@@ -90,7 +90,7 @@ export default function List() {
 
   return (
     <View
-      className="flex-1 px-6"
+      className={`flex-1 px-6 ${theme === "light" ? "bg-[#fed500]" : "bg-[#080830]"}`}
       style={{
         width: WINDOW_WIDTH,
         alignItems: "center",
@@ -110,11 +110,15 @@ export default function List() {
         <TextInput
           autoCapitalize={"words"}
           returnKeyType={"search"}
-          className={`w-full h-12 rounded-xl px-4 my-5 text-lg leading-[20px] ${theme === "light" ? "bg-white text-black":"bg-[#1c1c45] text-white"}`}
+          className={`w-full h-12 rounded-xl px-4 my-5 text-lg leading-[20px] ${
+            theme === "light"
+              ? "bg-white text-black"
+              : "bg-[#1c1c45] text-white"
+          }`}
           maxLength={20}
           placeholder="Search for a city or country"
           onChangeText={onChangeText}
-        placeholderTextColor="#888888"
+          placeholderTextColor="#888888"
         />
 
         {/* Show Filtered Cities */}
@@ -123,9 +127,9 @@ export default function List() {
             data={filterCities}
             renderItem={({ item }) => (
               <Pressable onPressIn={() => router.push(`/city/${item}`)}>
-              <Text className="text-white w-full my-2 mx-4 text-lg">
-                {item}
-              </Text>
+                <Text className="text-white w-full my-2 mx-4 text-lg">
+                  {item}
+                </Text>
               </Pressable>
             )}
             keyExtractor={(item) => item}
@@ -135,19 +139,8 @@ export default function List() {
         {/* Your favorite cities */}
         {cities?.length > 0 && filterCities?.length === 0 ? (
           cities?.map((v: any, i: number) => {
-            // Sunrise hour
-            const sunriseDate = new Date(v?.sys?.sunrise * 1000);
-            const sunriseHours = sunriseDate.getHours();
+            const { isNight } = getLocalDayTime(v);
 
-            // Sunset hour
-            const sunsetDate = new Date(v?.sys?.sunset * 1000);
-            const sunsetHours = sunsetDate.getHours();
-
-            // now time
-            const now = new Date(v?.timestamp).getHours();
-
-            const isNight = now >= sunsetHours || now < sunriseHours;
-            console.log(v);
             return (
               <Pressable
                 className="w-full h-36 mt-6 rounded-2xl flex-row px-5 py-3 justify-between"

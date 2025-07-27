@@ -1,44 +1,32 @@
-[
-  {
-    "base": "stations",
-    "clouds": { "all": 75 },
-    "cod": 200,
-    "coord": { "lat": 37.5665, "lon": 126.978 },
-    "dt": 1752430877,
-    "id": 1835848,
-    "main": {
-      "feels_like": 23.7,
-      "grnd_level": 987,
-      "humidity": 100,
-      "pressure": 997,
-      "sea_level": 997,
-      "temp": 22.76,
-      "temp_max": 22.76,
-      "temp_min": 22.76
-    },
-    "myLocation": true,
-    "name": "Seoul",
-    "sys": {
-      "country": "KR",
-      "id": 8105,
-      "sunrise": 1752438098,
-      "sunset": 1752490426,
-      "type": 1
-    },
-    "timestamp": 1752431439128,
-    "timezone": 32400,
-    "visibility": 10000,
-    "weather": [
-      {
-        "id": 500,
-        "main": "Rain",
-        "description": "light rain",
-        "icon": "10d"
-      }
-    ],
-    "wind": {
-      "deg": 50,
-      "speed": 1.03
-    }
-  }
-]
+{
+  "base": "stations",
+  "clouds": { "all": 20 },
+  "cod": 200,
+  "coord": { "lat": 40.713, "lon": -74.0072 },
+  "dt": 1753647226,
+  "id": 5128581,
+  "main": {
+    "feels_like": 33.11,
+    "grnd_level": 1012,
+    "humidity": 74,
+    "pressure": 1013,
+    "sea_level": 1013,
+    "temp": 28.84,
+    "temp_max": 30.15,
+    "temp_min": 27.21
+  },
+  "name": "New York",
+  "sys": {
+    "country": "US",
+    "id": 2008776,
+    "sunrise": 1753609686,
+    "sunset": 1753661804,
+    "type": 2
+  },
+  "timezone": -14400,
+  "visibility": 8047,
+  "weather": [
+    { "description": "haze", "icon": "50d", "id": 721, "main": "Haze" }
+  ],
+  "wind": { "deg": 230, "speed": 4.12 }
+}
