@@ -45,10 +45,10 @@ export default function Index() {
     ]);
 
   /**  To save in to Async storage */
-  const saveIntoAsyncStorage = async (params: any, city: string) => {
+  const saveIntoAsyncStorage = async (params: any) => {
+    
     const address = {
       ...params,
-      name: city,
       myLocation: true,
       timestamp: Date.now(),
     };
@@ -118,7 +118,8 @@ export default function Index() {
       const city = currentWeatherJSON?.name ? currentWeatherJSON?.name : "";
 
       setLocation(city);
-      saveIntoAsyncStorage(currentWeatherJSON, city);
+
+      saveIntoAsyncStorage(currentWeatherJSON);
 
       // set Sunrise, Sunset time for React Context
 

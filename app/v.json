@@ -1,32 +1,41 @@
-{
-  "base": "stations",
-  "clouds": { "all": 20 },
-  "cod": 200,
-  "coord": { "lat": 40.713, "lon": -74.0072 },
-  "dt": 1753647226,
-  "id": 5128581,
-  "main": {
-    "feels_like": 33.11,
-    "grnd_level": 1012,
-    "humidity": 74,
-    "pressure": 1013,
-    "sea_level": 1013,
-    "temp": 28.84,
-    "temp_max": 30.15,
-    "temp_min": 27.21
-  },
-  "name": "New York",
-  "sys": {
-    "country": "US",
-    "id": 2008776,
-    "sunrise": 1753609686,
-    "sunset": 1753661804,
-    "type": 2
-  },
-  "timezone": -14400,
-  "visibility": 8047,
-  "weather": [
-    { "description": "haze", "icon": "50d", "id": 721, "main": "Haze" }
-  ],
-  "wind": { "deg": 230, "speed": 4.12 }
-}
+[
+  {
+    "coord": { "lon": 12.5683, "lat": 55.6761 },
+    "weather": [
+      {
+        "id": 801,
+        "main": "Clouds",
+        "description": "few clouds",
+        "icon": "02n"
+      }
+    ],
+    "base": "stations",
+    "main": {
+      "temp": 17.33,
+      "feels_like": 16.89,
+      "temp_min": 15.19,
+      "temp_max": 17.94,
+      "pressure": 1009,
+      "humidity": 68,
+      "sea_level": 1009,
+      "grnd_level": 1007
+    },
+    "visibility": 10000,
+    "wind": { "speed": 4.63, "deg": 290 },
+    "clouds": { "all": 20 },
+    "dt": 1753739017,
+    "sys": {
+      "type": 2,
+      "id": 2035645,
+      "country": "DK",
+      "sunrise": 1753672084,
+      "sunset": 1753730648
+    },
+    "timezone": 7200,
+    "id": 6949461,
+    "name": "Inner City",
+    "cod": 200,
+    "myLocation": true,
+    "timestamp": 1753739083060
+  }
+]

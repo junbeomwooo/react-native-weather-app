@@ -2,7 +2,6 @@ import CustomHeader from "@/components/CustomHeader";
 import { ThemeContext } from "@/context/ThemeContext";
 import "@/global.css";
 import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
@@ -50,10 +49,12 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="list" />
-          <Stack.Screen name="city/[cityName]" options={{ headerShown:false}} />
+          <Stack.Screen
+            name="city/[cityID]"
+            options={{ headerShown: false }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <StatusBar style={theme === "light" ? "dark" : "light"} />
       </ThemeContext.Provider>
     </SafeAreaProvider>
   );

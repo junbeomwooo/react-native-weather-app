@@ -1,4 +1,3 @@
-
 import {
   ActivityIndicator,
   Dimensions,
@@ -10,7 +9,7 @@ import {
 import * as Location from "expo-location";
 import { Fragment, useEffect, useState } from "react";
 
-import { useGlobalSearchParams, useNavigation } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 
 import Feather from "@expo/vector-icons/Feather";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -23,10 +22,14 @@ import {
 import CityHeader from "@/components/CityHeader";
 import getLocalDayTime from "@/hooks/getLocalDayTime";
 
-export default function City() {
+import major_cities from "@/assets/major_cities_200.json";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
+export default function City() {
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
+
+  const router = useRouter();
 
   const [location, setLocation] = useState<any>(null);
 
@@ -34,14 +37,22 @@ export default function City() {
   const [hourlyWeather, setHourlyWeather] = useState([]);
   const [dailyWeather, setDailyWeather] = useState([]);
 
+  // Check if this city exists in your favorite city list
+  const [alearyExist, setAleadyExist] = useState(false);
+  const [storageData, setStorageData] = useState([]);
+
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
-  const { cityName } = useGlobalSearchParams();
+  const { cityID } = useGlobalSearchParams();
+  const cityObj = major_cities?.find((v: any) => v.id === Number(cityID));
+  const cityName = cityObj ? cityObj.name : "Unknown City";
+  const cityNumber = cityObj?.id;
+
   const seacrhedCity = Array.isArray(cityName) ? cityName[0] : cityName;
 
+  /** Get data */
   useEffect(() => {
     async function getCityWeather() {
-      console.log(seacrhedCity);
       const [{ latitude, longitude }] = await Location.geocodeAsync(
         seacrhedCity
       );
@@ -64,7 +75,6 @@ export default function City() {
 
       setLocation(city);
 
-
       // current weather
       setCurrentWeather(currentWeatherJSON);
 
@@ -83,7 +93,22 @@ export default function City() {
     getCityWeather();
   }, [WEATHER_API_KEY, seacrhedCity]);
 
-  const navigation = useNavigation();
+  /** Get AsyncStroage data */
+  useEffect(() => {
+    const getAsnycStorageData = async () => {
+      /** To check if the city already exists in your favorite city list */
+      const asyncStrageData = await AsyncStorage.getItem("location");
+
+      const existedData = asyncStrageData ? JSON.parse(asyncStrageData) : [];
+
+      setStorageData(existedData);
+      setAleadyExist(
+        existedData?.some((v: any) => v.name === currentWeather?.name)
+      );
+    };
+
+    getAsnycStorageData();
+  }, [currentWeather?.name]);
 
   // weatherID value
   const weatherId = currentWeather?.weather?.length
@@ -104,16 +129,50 @@ export default function City() {
 
   const { sunrise, sunset, isNight } = getLocalDayTime(currentWeather);
 
-  // to set up dynamic header title
-  useEffect(() => {
-    navigation.setOptions({
-      title: location,
-    });
-  }, [navigation, location, isNight]);
+  /** Save into AsyncStorage for Header */
+  const SaveIntoAsyncStorage = async () => {
+    const address = {
+      ...currentWeather,
+      timestamp: Date.now(),
+      cityID: cityNumber
+    };
+
+    try {
+      const currentArray = storageData != null ? storageData : [];
+
+      const updatedArray = currentArray.some(
+        (v: any) => v.cityID === address.cityID
+      )
+        ? currentArray
+        : [...currentArray, address];
+
+      await AsyncStorage.setItem("location", JSON.stringify(updatedArray));
+
+      router.push("/list");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  /** Delete AsynvStorage ITem */
+  const DeleteStorageItem = async () => {
+    try {
+      await AsyncStorage.clear();
+      router.push("/list");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Fragment>
-      <CityHeader title={location} isNight={isNight} />
+      <CityHeader
+        title={location}
+        isNight={isNight}
+        alearyExist={alearyExist}
+        onClickSaveIntoAsync={SaveIntoAsyncStorage}
+        DeleteStorageItem={DeleteStorageItem}
+      />
 
       <ScrollView
         className={`flex-1 px-10 ${isNight ? "bg-[#080830]" : "bg-[#fed500]"}`}

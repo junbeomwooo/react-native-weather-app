@@ -7,6 +7,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+import { StatusBar } from "expo-status-bar";
+
 export default function CustomHeader({ title }: { title?: string }) {
   const { theme } = useContext(ThemeContext);
 
@@ -32,7 +34,7 @@ export default function CustomHeader({ title }: { title?: string }) {
       {pathname === "/" ? (
         <Ionicons name="menu-outline" size={28} color={iconColor} />
       ) : (
-        <Pressable onPress={() => router.back()} hitSlop={5}>
+        <Pressable onPress={() => router.push("/")} hitSlop={5}>
           <Ionicons
             name="chevron-back-circle-outline"
             size={28}
@@ -57,6 +59,8 @@ export default function CustomHeader({ title }: { title?: string }) {
       ) : (
         <AntDesign name="edit" size={25} color={iconColor} />
       )}
+
+      <StatusBar style={theme === "light" ? "dark" : "light"} />
     </SafeAreaView>
   );
 }
