@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   Dimensions,
   ScrollView,
   Text,
@@ -38,8 +39,7 @@ export default function City() {
   const [dailyWeather, setDailyWeather] = useState([]);
 
   // Check if this city exists in your favorite city list
-  const [alearyExist, setAleadyExist] = useState(false);
-  const [storageData, setStorageData] = useState([]);
+  const [alreadyExist, setAleadyExist] = useState(false);
 
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
@@ -95,21 +95,49 @@ export default function City() {
 
   /** Get AsyncStroage data */
   useEffect(() => {
-    const getAsnycStorageData = async () => {
+    const getAsyncStorageData = async () => {
       /** To check if the city already exists in your favorite city list */
-      const asyncStrageData = await AsyncStorage.getItem("location");
+      const asyncStrageData = await AsyncStorage.getItem(`city-${cityID}`);
 
-      const existedData = asyncStrageData ? JSON.parse(asyncStrageData) : [];
+      const existedData = asyncStrageData ? JSON.parse(asyncStrageData) : null;
 
-      setStorageData(existedData);
-      setAleadyExist(
-        existedData?.some((v: any) => v.name === currentWeather?.name)
-      );
+      console.log(existedData);
+
+      if (existedData) setAleadyExist(true);
     };
 
-    getAsnycStorageData();
-  }, [currentWeather?.name]);
+    getAsyncStorageData();
+  }, [cityID]);
 
+  /** Save into AsyncStorage for Header */
+  const SaveIntoAsyncStorage = async () => {
+    const address = {
+      ...currentWeather,
+      cityID: cityNumber,
+    };
+    try {
+      if (alreadyExist) {
+        Alert.alert("This city has already been added to your favorites.");
+        return;
+      }
+
+      await AsyncStorage.setItem(`city-${cityID}`, JSON.stringify(address));
+
+      router.push("/list");
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  /** Delete AsynvStorage ITem */
+  const DeleteStorageItem = async () => {
+    try {
+      await AsyncStorage.removeItem(`city-${cityID}`);
+      router.push("/list");
+    } catch (err) {
+      console.log(err);
+    }
+  };
   // weatherID value
   const weatherId = currentWeather?.weather?.length
     ? currentWeather.weather[0].id
@@ -129,47 +157,12 @@ export default function City() {
 
   const { sunrise, sunset, isNight } = getLocalDayTime(currentWeather);
 
-  /** Save into AsyncStorage for Header */
-  const SaveIntoAsyncStorage = async () => {
-    const address = {
-      ...currentWeather,
-      timestamp: Date.now(),
-      cityID: cityNumber
-    };
-
-    try {
-      const currentArray = storageData != null ? storageData : [];
-
-      const updatedArray = currentArray.some(
-        (v: any) => v.cityID === address.cityID
-      )
-        ? currentArray
-        : [...currentArray, address];
-
-      await AsyncStorage.setItem("location", JSON.stringify(updatedArray));
-
-      router.push("/list");
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  /** Delete AsynvStorage ITem */
-  const DeleteStorageItem = async () => {
-    try {
-      await AsyncStorage.clear();
-      router.push("/list");
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   return (
     <Fragment>
       <CityHeader
         title={location}
         isNight={isNight}
-        alearyExist={alearyExist}
+        alearyExist={alreadyExist}
         onClickSaveIntoAsync={SaveIntoAsyncStorage}
         DeleteStorageItem={DeleteStorageItem}
       />

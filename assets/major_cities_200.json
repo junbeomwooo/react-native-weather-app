@@ -758,5 +758,74 @@
   {
     "id": 190,
     "name": "Zurich"
+  },
+  {
+    "id": 191,
+    "name": "Osaka"
+  },
+  {
+    "id": 192,
+    "name": "San Francisco"
+  },
+  {
+    "id": 193,
+    "name": "Seattle"
+  },
+  {
+    "id": 194,
+    "name": "Boston"
+  },
+  {
+    "id": 195,
+    "name": "Chengdu"
+  },
+  {
+    "id": 196,
+    "name": "Xi'an"
+  },
+  {
+    "id": 197,
+    "name": "Jaipur"
+  },
+  {
+    "id": 198,
+    "name": "Sapporo"
+  },
+  {
+    "id": 199,
+    "name": "Incheon"
+  },
+  {
+    "id": 200,
+    "name": "Odense"
+  },
+  {
+    "id": 201,
+    "name": "Frankfurt"
+  },
+  {
+    "id": 202,
+    "name": "Nice"
+  },
+  {
+    "id": 203,
+    "name": "Chiang Mai"
+  },
+  {
+    "id": 205,
+    "name": "Penang"
+  },
+  {
+    "id": 206,
+    "name": "Medina"
+  },
+   {
+    "id": 207,
+    "name": "Abu Dhabi"
+  },
+  {
+    "id": 208,
+    "name": "Marrakech"
   }
+  
 ]

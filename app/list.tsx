@@ -107,6 +107,13 @@ export default function List() {
     ).start();
   }, [WINDOW_HEIGHT, translate, WINDOW_WIDTH]);
 
+  // To sort the ‘myLocation’ city to the top
+  const sortedCities = [...cities].sort((a: any, b: any) => {
+    if (a.myLocation) return -1;
+    if (b.myLocation) return 1;
+    return 0;
+  });
+
   return (
     <View
       className={`flex-1 px-6 ${
@@ -148,7 +155,11 @@ export default function List() {
             data={filterCities}
             renderItem={({ item }: { item: { id: number; name: string } }) => (
               <Pressable onPressIn={() => router.push(`/city/${item?.id}`)}>
-                <Text className="text-white w-full my-2 mx-4 text-lg">
+                <Text
+                  className={`${
+                    theme === "light" ? "text-black" : "text-white"
+                  } w-full my-2 mx-4 text-lg`}
+                >
                   {item?.name}
                 </Text>
               </Pressable>
@@ -159,10 +170,10 @@ export default function List() {
 
         {/* Your favorite cities */}
         <ScrollView contentContainerStyle={{ paddingBottom: 50 }}>
-          {cities?.length > 0 && filterCities?.length === 0 ? (
-            cities?.reverse().map((v: any, i: number) => {
+          {sortedCities?.length > 0 && filterCities?.length === 0 ? (
+            sortedCities?.map((v: any, i: number) => {
               const { isNight } = getLocalDayTime(v);
-              const desc = v?.weather?.[0]?.description ?? ""; 
+              const desc = v?.weather?.[0]?.description ?? "";
 
               return (
                 <Pressable
