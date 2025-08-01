@@ -28,9 +28,11 @@ export default function List() {
   const WINDOW_HEIGHT = Dimensions.get("window").width;
 
   /** Data for favorite cities */
-  const [cities, setCities] = useState([]);
+  const [cities, setCities] = useState([{}]);
 
   const capitalizeDesc = (desc: string) => {
+    if (!desc) return "";
+
     return desc
       ?.split(" ")
       ?.map((v) => v?.charAt(0)?.toUpperCase() + v?.slice(1))
@@ -40,11 +42,24 @@ export default function List() {
   /** Recieve asnyce storage data */
   useEffect(() => {
     const getData = async () => {
-      const address = await AsyncStorage.getItem("location");
+      try {
+        const keys = await AsyncStorage.getAllKeys();
 
-      if (address) {
-        const parsedData = JSON.parse(address);
-        setCities(parsedData);
+        const allDataFromStorage = await AsyncStorage.multiGet(keys);
+
+        const parsed = allDataFromStorage.map(
+          ([key, value]: [key: string, value: any]) => {
+            try {
+              return JSON.parse(value);
+            } catch {
+              return null;
+            }
+          }
+        );
+
+        setCities(parsed);
+      } catch (error) {
+        console.error("Failed to load all cities:", error);
       }
     };
     getData();
@@ -147,6 +162,7 @@ export default function List() {
           {cities?.length > 0 && filterCities?.length === 0 ? (
             cities?.reverse().map((v: any, i: number) => {
               const { isNight } = getLocalDayTime(v);
+              const desc = v?.weather?.[0]?.description ?? ""; 
 
               return (
                 <Pressable
@@ -221,7 +237,7 @@ export default function List() {
                           isNight ? "text-white" : "text-black"
                         } font-medium text-[12px]`}
                       >
-                        {capitalizeDesc(v?.weather[0]?.description)}
+                        {capitalizeDesc(desc)}
                       </Text>
                     </View>
                   </View>

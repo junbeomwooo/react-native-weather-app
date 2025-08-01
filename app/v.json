@@ -1,41 +1,37 @@
-[
-  {
-    "coord": { "lon": 12.5683, "lat": 55.6761 },
-    "weather": [
-      {
-        "id": 801,
-        "main": "Clouds",
-        "description": "few clouds",
-        "icon": "02n"
-      }
-    ],
-    "base": "stations",
-    "main": {
-      "temp": 17.33,
-      "feels_like": 16.89,
-      "temp_min": 15.19,
-      "temp_max": 17.94,
-      "pressure": 1009,
-      "humidity": 68,
-      "sea_level": 1009,
-      "grnd_level": 1007
-    },
-    "visibility": 10000,
-    "wind": { "speed": 4.63, "deg": 290 },
-    "clouds": { "all": 20 },
-    "dt": 1753739017,
-    "sys": {
-      "type": 2,
-      "id": 2035645,
-      "country": "DK",
-      "sunrise": 1753672084,
-      "sunset": 1753730648
-    },
-    "timezone": 7200,
-    "id": 6949461,
-    "name": "Inner City",
-    "cod": 200,
-    "myLocation": true,
-    "timestamp": 1753739083060
-  }
-]
+{
+  "base": "stations",
+  "clouds": { "all": 75 },
+  "cod": 200,
+  "coord": { "lat": 55.6761, "lon": 12.5683 },
+  "dt": 1754047278,
+  "id": 6949461,
+  "main": {
+    "feels_like": 19.97,
+    "grnd_level": 1003,
+    "humidity": 70,
+    "pressure": 1006,
+    "sea_level": 1006,
+    "temp": 20.08,
+    "temp_max": 20.08,
+    "temp_min": 19.94
+  },
+  "name": "Inner City",
+  "sys": {
+    "country": "DK",
+    "id": 2035645,
+    "sunrise": 1754018122,
+    "sunset": 1754075796,
+    "type": 2
+  },
+  "timezone": 7200,
+  "visibility": 10000,
+  "weather": [
+    {
+      "description": "broken clouds",
+      "icon": "04d",
+      "id": 803,
+      "main": "Clouds"
+    }
+  ],
+  "wind": { "deg": 120, "speed": 3.6 }
+}

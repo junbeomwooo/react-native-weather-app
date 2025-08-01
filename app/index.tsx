@@ -46,33 +46,25 @@ export default function Index() {
 
   /**  To save in to Async storage */
   const saveIntoAsyncStorage = async (params: any) => {
-    
-    const address = {
+    const currentLocation = {
       ...params,
-      myLocation: true,
-      timestamp: Date.now(),
-    };
-
+      myLocation:true
+    }
     try {
-      const existing = await AsyncStorage.getItem("location");
-
-      let data;
+      const existing = await AsyncStorage.getItem("myLocation");
 
       if (existing) {
-        // If there is data in storage,
         const parsed = JSON.parse(existing);
 
-        // Remove data array which has myLocation value
-        const filtered = parsed.filter((item: any) => !item.myLocation);
-
-        data = [...filtered, address];
-      } else {
-        //  If there is no data in storage, just save a new data
-        data = [address];
+        // if its same city, do not save
+        if (parsed.id === params.id) {
+          console.log("Same location, skipping save.");
+          return;
+        }
       }
 
       // Set into storage
-      await AsyncStorage.setItem("location", JSON.stringify(data));
+      await AsyncStorage.setItem("myLocation", JSON.stringify(currentLocation));
     } catch (err) {
       console.error(`Failed to save location data to storage : ${err}`);
     }
@@ -180,7 +172,9 @@ export default function Index() {
 
   return (
     <ScrollView
-      className={`flex-1 px-10 ${theme === "light" ? "bg-[#fed500]" : "bg-[#080830]"}`}
+      className={`flex-1 px-10 ${
+        theme === "light" ? "bg-[#fed500]" : "bg-[#080830]"
+      }`}
       style={{ width: WINDOW_WIDTH }}
       contentContainerStyle={{
         justifyContent: "center",
