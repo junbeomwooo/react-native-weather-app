@@ -1,11 +1,15 @@
 import CustomHeader from "@/components/CustomHeader";
+
+import { EditProvider } from "@/context/EditContext";
 import { ThemeContext } from "@/context/ThemeContext";
+
 import "@/global.css";
 import { Stack } from "expo-router";
 import { useEffect, useState } from "react";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
+  /** Global Theme context value */
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [sunset, setSunset] = useState<number | null>(null);
   const [sunrise, setSunrise] = useState<number | null>(null);
@@ -38,23 +42,25 @@ export default function RootLayout() {
           setSunset: setSunset,
         }}
       >
-        <Stack
-          screenOptions={{
-            header: (props) => {
-              return <CustomHeader title={props.options.title} />;
-            },
-            // contentStyle: {
-            //   backgroundColor: theme === "light" ? "#fed500" : "#080830",
-            // },
-          }}
-        >
-          <Stack.Screen name="list" />
-          <Stack.Screen
-            name="city/[cityID]"
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <EditProvider>
+          <Stack
+            screenOptions={{
+              header: (props) => {
+                return <CustomHeader title={props.options.title} />;
+              },
+              // contentStyle: {
+              //   backgroundColor: theme === "light" ? "#fed500" : "#080830",
+              // },
+            }}
+          >
+            <Stack.Screen name="list" />
+            <Stack.Screen
+              name="city/[cityID]"
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </EditProvider>
       </ThemeContext.Provider>
     </SafeAreaProvider>
   );

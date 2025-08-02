@@ -1,3 +1,4 @@
+import { EditContext } from "@/context/EditContext";
 import { ThemeContext } from "@/context/ThemeContext";
 
 import { Fragment, useContext, useEffect, useRef, useState } from "react";
@@ -20,16 +21,27 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import getLocalDayTime from "@/hooks/getLocalDayTime";
 
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
 export default function List() {
+  /** Global context state  */
   const { theme } = useContext(ThemeContext);
+  const editContext = useContext(EditContext);
+  if (!editContext)
+    throw new Error("EditContext must be used within EditProvider");
+  const { isEditOpen } = editContext;
+
+  /** router */
   const router = useRouter();
 
+  /** The width and height for device */
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").width;
 
   /** Data for favorite cities */
   const [cities, setCities] = useState([{}]);
 
+  /** Capitalize function */
   const capitalizeDesc = (desc: string) => {
     if (!desc) return "";
 
@@ -175,104 +187,116 @@ export default function List() {
               const { isNight } = getLocalDayTime(v);
               const desc = v?.weather?.[0]?.description ?? "";
 
+
               return (
-                <Pressable
-                  className="w-full h-36 mt-6 rounded-2xl flex-row px-5 py-3 justify-between"
-                  key={i}
-                  onPress={() =>
-                    v?.myLocation === true
-                      ? router.push("/")
-                      : router.push(`/city/${v?.cityID}`)
-                  }
-                >
-                  <View className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden rounded-2xl ">
-                    <Animated.View
-                      style={{
-                        width: "300%",
-                        height: "300%",
-                        transform: [
-                          { translateX: translate.x },
-                          { translateY: translate.y },
-                        ],
-                      }}
-                    >
-                      <LinearGradient
-                        colors={
-                          isNight
-                            ? [
-                                "#0a0a3c",
-                                "#1a237e",
-                                "#3f51b5",
-                                "#140478",
-                                "black",
-                              ]
-                            : [
-                                "#fef3b3",
-                                "#ffd97d",
-                                "#ffc857",
-                                "#ffb347",
-                                "#ffeabf",
-                              ]
-                        }
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
+                <View key={i} className="flex-row items-center flex-1">
+                  {isEditOpen && !v?.myLocation &&  (
+                    
+                    <MaterialIcons
+                      name="cancel"
+                      size={30}
+                      color="red"
+                      className="mt-6 mr-3"
+                    />
+                  )}
+
+                  <Pressable
+                    className={`mt-6 rounded-2xl flex-row px-5 py-3 justify-between flex-1 ${isEditOpen ? "h-24" : "h-36"}`}
+                    onPress={() =>
+                      v?.myLocation === true
+                        ? router.push("/")
+                        : router.push(`/city/${v?.cityID}`)
+                    }
+                  >
+                    <View className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden rounded-2xl ">
+                      <Animated.View
                         style={{
-                          width: "100%",
-                          height: "100%",
+                          width: "300%",
+                          height: "300%",
+                          transform: [
+                            { translateX: translate.x },
+                            { translateY: translate.y },
+                          ],
                         }}
-                      />
-                    </Animated.View>
-                  </View>
-                  <View className="justify-between">
-                    <View>
-                      <Text
-                        className={`${
-                          isNight ? "text-white" : "text-black"
-                        } font-bold text-[25px]`}
-                        numberOfLines={1}
-                        style={{ maxWidth: 190 }}
                       >
-                        {v.name}
-                      </Text>
-                      <Text
-                        className={`${
-                          isNight ? "text-white" : "text-black"
-                        } font-semibold text-[12px]`}
-                      >
-                        {v?.myLocation ? "My Location" : ""}
-                      </Text>
+                        <LinearGradient
+                          colors={
+                            isNight
+                              ? [
+                                  "#0a0a3c",
+                                  "#1a237e",
+                                  "#3f51b5",
+                                  "#140478",
+                                  "black",
+                                ]
+                              : [
+                                  "#fef3b3",
+                                  "#ffd97d",
+                                  "#ffc857",
+                                  "#ffb347",
+                                  "#ffeabf",
+                                ]
+                          }
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                          }}
+                        />
+                      </Animated.View>
                     </View>
-                    <View>
-                      <Text
-                        className={`${
-                          isNight ? "text-white" : "text-black"
-                        } font-medium text-[12px]`}
-                      >
-                        {capitalizeDesc(desc)}
-                      </Text>
+                    <View className="justify-between">
+                      <View>
+                        <Text
+                          className={`${
+                            isNight ? "text-white" : "text-black"
+                          } font-bold text-[23px]`}
+                          numberOfLines={1}
+                          style={{ maxWidth: 190 }}
+                        >
+                          {v.name}
+                        </Text>
+                        <Text
+                          className={`${
+                            isNight ? "text-white" : "text-black"
+                          } font-semibold text-[12px]`}
+                        >
+                          {v?.myLocation ? "My Location" : ""}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          className={`${
+                            isNight ? "text-white" : "text-black"
+                          } font-medium text-[12px] ${isEditOpen && "hidden"}`}
+                        >
+                          {capitalizeDesc(desc)}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                  <View className="justify-between">
-                    <View>
-                      <Text
-                        className={`${
-                          isNight ? "text-white" : "text-black"
-                        } font-bold text-[40px] text-right`}
-                      >
-                        {Math.round(v?.main?.temp)}°
-                      </Text>
+                    <View className="justify-between">
+                      <View>
+                        <Text
+                          className={`${
+                            isNight ? "text-white" : "text-black"
+                          } font-bold text-[40px] text-right`}
+                        >
+                          {Math.round(v?.main?.temp)}°
+                        </Text>
+                      </View>
+                      <View>
+                        <Text
+                          className={`${
+                            isNight ? "text-white" : "text-black"
+                          } font-medium text-[12px] ${isEditOpen && "hidden"}`}
+                        >
+                          Feels_like: {Math.round(v?.main?.feels_like)}°
+                        </Text>
+                      </View>
                     </View>
-                    <View>
-                      <Text
-                        className={`${
-                          isNight ? "text-white" : "text-black"
-                        } font-medium text-[12px]`}
-                      >
-                        Feels_like: {Math.round(v?.main?.feels_like)}°
-                      </Text>
-                    </View>
-                  </View>
-                </Pressable>
+                  </Pressable>
+                </View>
               );
             })
           ) : (

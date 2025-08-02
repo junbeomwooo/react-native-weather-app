@@ -1,5 +1,6 @@
+import { EditContext } from "@/context/EditContext";
 import { ThemeContext } from "@/context/ThemeContext";
-import { Link, usePathname, useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 import { useContext } from "react";
 import { Pressable, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,7 +11,12 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { StatusBar } from "expo-status-bar";
 
 export default function CustomHeader({ title }: { title?: string }) {
+  /** Global context state */
   const { theme } = useContext(ThemeContext);
+  const editContext = useContext(EditContext);
+  if (!editContext)
+    throw new Error("EditContext must be used within EditProvider");
+  const { isEditOpen, setIsEditOpen } = editContext;
 
   const textColor = theme === "light" ? "text-black" : "text-white";
   const iconColor = theme === "light" ? "black" : "white";
@@ -32,13 +38,16 @@ export default function CustomHeader({ title }: { title?: string }) {
     >
       {/* left */}
       {pathname === "/" ? (
-        <Ionicons name="menu-outline" size={28} color={iconColor} />
+        <Pressable hitSlop={5}>
+          <Ionicons name="menu-outline" size={28} color={iconColor} />
+        </Pressable>
       ) : (
         <Pressable onPress={() => router.push("/")} hitSlop={5}>
           <Ionicons
             name="chevron-back-circle-outline"
             size={28}
             color={iconColor}
+            className={`${isEditOpen ? "hidden" : ""}`}
           />
         </Pressable>
       )}
@@ -53,11 +62,17 @@ export default function CustomHeader({ title }: { title?: string }) {
 
       {/* right */}
       {pathname === "/" ? (
-        <Link href="/list">
+        <Pressable hitSlop={5} onPress={() => router.push("/list")}>
           <Ionicons name="compass-outline" size={28} color={iconColor} />
-        </Link>
+        </Pressable>
+      ) : isEditOpen ? (
+        <Pressable hitSlop={5} onPress={() => setIsEditOpen(false)}>
+          <Text className={`text-lg font-medium mr-2 py-[1.6px] ${theme === "light" ? "text-black" : "text-white"}`}>Done</Text>
+        </Pressable>
       ) : (
-        <AntDesign name="edit" size={25} color={iconColor} />
+        <Pressable hitSlop={5} onPress={() => setIsEditOpen(true)}>
+          <AntDesign name="edit" size={28} color={iconColor} />
+        </Pressable>
       )}
 
       <StatusBar style={theme === "light" ? "dark" : "light"} />

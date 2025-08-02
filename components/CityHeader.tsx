@@ -14,18 +14,18 @@ export default function CityHeader({
   title,
   alearyExist,
   onClickSaveIntoAsync,
-  DeleteStorageItem
+  DeleteStorageItem,
 }: {
   isNight?: boolean;
   title: string;
   alearyExist: boolean;
   onClickSaveIntoAsync: () => void;
-  DeleteStorageItem:() => void;
+  DeleteStorageItem: () => void;
 }) {
+  const router = useRouter();
+
   const textColor = !isNight ? "text-black" : "text-white";
   const iconColor = !isNight ? "black" : "white";
-
-  const router = useRouter();
 
   return (
     <SafeAreaView

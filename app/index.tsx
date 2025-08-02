@@ -33,10 +33,12 @@ export default function Index() {
 
   const [location, setLocation] = useState<any>(null);
 
+  /** For data */
   const [currentWeather, setCurrentWeather] = useState<any>({});
   const [hourlyWeather, setHourlyWeather] = useState([]);
   const [dailyWeather, setDailyWeather] = useState([]);
 
+  /** API key */
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
   const permissionDenied = (title: string, msg: string) =>
@@ -48,8 +50,8 @@ export default function Index() {
   const saveIntoAsyncStorage = async (params: any) => {
     const currentLocation = {
       ...params,
-      myLocation:true
-    }
+      myLocation: true,
+    };
     try {
       const existing = await AsyncStorage.getItem("myLocation");
 
@@ -70,6 +72,7 @@ export default function Index() {
     }
   };
 
+  /** Get data */
   useEffect(() => {
     async function getCurrentLocation() {
       let { status } = await Location.requestForegroundPermissionsAsync();
