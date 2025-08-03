@@ -1,9 +1,8 @@
 import { EditContext } from "@/context/EditContext";
 import { ThemeContext } from "@/context/ThemeContext";
 
-import { Fragment, useContext, useEffect, useRef, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import {
-  Animated,
   Dimensions,
   FlatList,
   Pressable,
@@ -22,6 +21,14 @@ import { LinearGradient } from "expo-linear-gradient";
 import getLocalDayTime from "@/hooks/getLocalDayTime";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
 export default function List() {
   /** Global context state  */
@@ -100,36 +107,18 @@ export default function List() {
   };
 
   /** Delete AsynvStorage ITem */
-  const DeleteStorageItem = async (cityID:number) => {
-    console.log(cityID);
+  const DeleteStorageItem = async (cityID: number) => {
     try {
       await AsyncStorage.removeItem(`city-${cityID}`);
-      router.push("/")
+      router.push("/list");
+      setCities((prev) => {
+        const updateded = prev.filter((v: any) => v?.cityID !== cityID);
+        return updateded;
+      });
     } catch (err) {
       console.log(err);
     }
   };
-
-  /** Linear Gradient Animation */
-
-  const translate = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(translate, {
-          toValue: { x: -WINDOW_WIDTH / 2, y: -WINDOW_HEIGHT / 4 },
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(translate, {
-          toValue: { x: 0, y: 0 },
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, [WINDOW_HEIGHT, translate, WINDOW_WIDTH]);
 
   // To sort the ‘myLocation’ city to the top
   const sortedCities = [...cities].sort((a: any, b: any) => {
@@ -137,6 +126,46 @@ export default function List() {
     if (b.myLocation) return 1;
     return 0;
   });
+
+  /** Linear Gradient Animation */
+
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+
+  useEffect(() => {
+    translateX.value = withRepeat(
+      withSequence(
+        withTiming(-WINDOW_WIDTH / 2, { duration: 4000 }),
+        withTiming(0, { duration: 4000 })
+      ),
+      -1,
+      true
+    );
+
+    translateY.value = withRepeat(
+      withSequence(
+        withTiming(-WINDOW_HEIGHT / 4, { duration: 4000 }),
+        withTiming(0, { duration: 4000})
+      ),
+      -1,
+      true
+    );
+  }, [translateX, translateY, WINDOW_HEIGHT, WINDOW_WIDTH]);
+
+  const gradientAnimationStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateX: translateX.value },
+        { translateY: translateY.value },
+      ],
+    };
+  });
+
+  /** Animations  */
+
+  // when user clicks edit button list's UI height will be smaller
+
+  const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
   return (
     <View
@@ -197,7 +226,6 @@ export default function List() {
             sortedCities?.map((v: any, i: number) => {
               const { isNight } = getLocalDayTime(v);
               const desc = v?.weather?.[0]?.description ?? "";
-              console.log(v);
 
               return (
                 <View key={i} className="flex-row items-center flex-1">
@@ -211,7 +239,7 @@ export default function List() {
                     />
                   )}
 
-                  <Pressable
+                  <AnimatedPressable
                     className={`mt-6 rounded-2xl flex-row px-5 py-3 justify-between flex-1 ${
                       isEditOpen ? "h-24" : "h-36"
                     }`}
@@ -223,14 +251,13 @@ export default function List() {
                   >
                     <View className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden rounded-2xl ">
                       <Animated.View
-                        style={{
-                          width: "300%",
-                          height: "300%",
-                          transform: [
-                            { translateX: translate.x },
-                            { translateY: translate.y },
-                          ],
-                        }}
+                        style={[
+                          {
+                            width: "300%",
+                            height: "300%",
+                          },
+                          gradientAnimationStyle,
+                        ]}
                       >
                         <LinearGradient
                           colors={
@@ -308,7 +335,7 @@ export default function List() {
                         </Text>
                       </View>
                     </View>
-                  </Pressable>
+                  </AnimatedPressable>
                 </View>
               );
             })
