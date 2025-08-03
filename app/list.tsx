@@ -84,6 +84,7 @@ export default function List() {
     { id: number; name: string }[]
   >([]);
 
+  // Filter cities based on user input
   const onChangeText = (text: string) => {
     setSearchInput(text);
 
@@ -95,6 +96,17 @@ export default function List() {
       setFilteredCities(filtered);
     } else {
       setFilteredCities([]);
+    }
+  };
+
+  /** Delete AsynvStorage ITem */
+  const DeleteStorageItem = async (cityID:number) => {
+    console.log(cityID);
+    try {
+      await AsyncStorage.removeItem(`city-${cityID}`);
+      router.push("/")
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -148,7 +160,6 @@ export default function List() {
 
       <View className="w-full flex-1">
         <TextInput
-          autoCapitalize={"words"}
           returnKeyType={"search"}
           className={`w-full h-12 rounded-xl px-4 my-5 text-lg leading-[20px] ${
             theme === "light"
@@ -186,22 +197,24 @@ export default function List() {
             sortedCities?.map((v: any, i: number) => {
               const { isNight } = getLocalDayTime(v);
               const desc = v?.weather?.[0]?.description ?? "";
-
+              console.log(v);
 
               return (
                 <View key={i} className="flex-row items-center flex-1">
-                  {isEditOpen && !v?.myLocation &&  (
-                    
+                  {isEditOpen && !v?.myLocation && (
                     <MaterialIcons
                       name="cancel"
                       size={30}
                       color="red"
-                      className="mt-6 mr-3"
+                      className="mt-6 mr-5"
+                      onPress={() => DeleteStorageItem(v?.cityID)}
                     />
                   )}
 
                   <Pressable
-                    className={`mt-6 rounded-2xl flex-row px-5 py-3 justify-between flex-1 ${isEditOpen ? "h-24" : "h-36"}`}
+                    className={`mt-6 rounded-2xl flex-row px-5 py-3 justify-between flex-1 ${
+                      isEditOpen ? "h-24" : "h-36"
+                    }`}
                     onPress={() =>
                       v?.myLocation === true
                         ? router.push("/")
