@@ -33,10 +33,10 @@ export default function CityHeader({
         !isNight ? "bg-[#fed500]" : "bg-[#080830]"
       }`}
       style={{
-        paddingTop: 20,
+        paddingTop: 15,
         paddingLeft: 20,
         paddingRight: 20,
-        paddingBottom: -10,
+        paddingBottom: -15,
       }}
     >
       {/* left */}

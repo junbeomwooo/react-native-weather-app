@@ -1,6 +1,6 @@
 import CustomHeader from "@/components/CustomHeader";
 
-import { EditProvider } from "@/context/EditContext";
+import { ListProvider } from "@/context/EditContext";
 import { ThemeContext } from "@/context/ThemeContext";
 
 import "@/global.css";
@@ -42,7 +42,7 @@ export default function RootLayout() {
           setSunset: setSunset,
         }}
       >
-        <EditProvider>
+        <ListProvider>
           <Stack
             screenOptions={{
               header: (props) => {
@@ -53,14 +53,14 @@ export default function RootLayout() {
               // },
             }}
           >
-            <Stack.Screen name="list" />
+            <Stack.Screen name="list"  />
             <Stack.Screen
               name="city/[cityID]"
               options={{ headerShown: false }}
             />
             <Stack.Screen name="+not-found" />
           </Stack>
-        </EditProvider>
+        </ListProvider>
       </ThemeContext.Provider>
     </SafeAreaProvider>
   );

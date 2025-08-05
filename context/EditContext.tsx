@@ -3,21 +3,27 @@ import React, { createContext, ReactNode, useState } from "react";
 export type EditContextType = {
   isEditOpen: boolean;
   setIsEditOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  textInputPressIn: boolean;
+  setTextInputPressIn: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const EditContext = createContext<EditContextType | undefined>(
+export const ListContext = createContext<EditContextType | undefined>(
   undefined
 );
 
 // export const IsEditOpenContext = createContext<boolean>(false);
 // export const SetIsEditOpenContext = createContext<React.Dispatch<boolean>>(() => {});
 
-export const EditProvider = ({ children }: { children: ReactNode }) => {
+export const ListProvider = ({ children }: { children: ReactNode }) => {
+  // State value for checking if user clicked edit button
   const [isEditOpen, setIsEditOpen] = useState(false);
 
+  // State value for checking if user is focusing on textInput
+  const [textInputPressIn, setTextInputPressIn] = useState(false);
+
   return (
-    <EditContext.Provider value={{ isEditOpen, setIsEditOpen }}>
+    <ListContext.Provider value={{ isEditOpen, setIsEditOpen, textInputPressIn, setTextInputPressIn }}>
       {children}
-    </EditContext.Provider>
+    </ListContext.Provider>
   );
 };
