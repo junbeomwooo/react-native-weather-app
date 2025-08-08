@@ -45,50 +45,53 @@ export default function City() {
 
   const { cityID } = useGlobalSearchParams();
   const cityObj = major_cities?.find((v: any) => v.id === Number(cityID));
-  const cityName = cityObj ? cityObj.name : "Unknown City";
+  const cityName = cityObj?.name;
   const cityNumber = cityObj?.id;
-
   const seacrhedCity = Array.isArray(cityName) ? cityName[0] : cityName;
 
   /** Get data */
   useEffect(() => {
+    if (!seacrhedCity) return;
     async function getCityWeather() {
-      const [{ latitude, longitude }] = await Location.geocodeAsync(
-        seacrhedCity
-      );
+      try {
+        const [{ latitude, longitude }] =
+          await Location.geocodeAsync(seacrhedCity);
 
-      const [current, hourly] = await Promise.all([
-        fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
-        ),
-        fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
-        ),
-      ]);
+        const [current, hourly] = await Promise.all([
+          fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
+          ),
+          fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
+          ),
+        ]);
 
-      const [currentWeatherJSON, hourlyWeatherJSON] = await Promise.all([
-        current.json(),
-        hourly.json(),
-      ]);
+        const [currentWeatherJSON, hourlyWeatherJSON] = await Promise.all([
+          current.json(),
+          hourly.json(),
+        ]);
 
-      const city = currentWeatherJSON?.name ? currentWeatherJSON?.name : "";
+        const city = currentWeatherJSON?.name ? currentWeatherJSON?.name : "";
 
-      setLocation(city);
+        setLocation(city);
 
-      // current weather
-      setCurrentWeather(currentWeatherJSON);
+        // current weather
+        setCurrentWeather(currentWeatherJSON);
 
-      // hourly weather
-      setHourlyWeather(hourlyWeatherJSON?.list?.slice(0, 10));
+        // hourly weather
+        setHourlyWeather(hourlyWeatherJSON?.list?.slice(0, 10));
 
-      //  daily weather
-      setDailyWeather(
-        hourlyWeatherJSON?.list?.filter((v: any) => {
-          if (v?.dt_txt?.includes("12:00:00")) {
-            return v;
-          }
-        })
-      );
+        //  daily weather
+        setDailyWeather(
+          hourlyWeatherJSON?.list?.filter((v: any) => {
+            if (v?.dt_txt?.includes("12:00:00")) {
+              return v;
+            }
+          })
+        );
+      } catch (err) {
+        console.error(err);
+      }
     }
     getCityWeather();
   }, [WEATHER_API_KEY, seacrhedCity]);
@@ -100,8 +103,6 @@ export default function City() {
       const asyncStrageData = await AsyncStorage.getItem(`city-${cityID}`);
 
       const existedData = asyncStrageData ? JSON.parse(asyncStrageData) : null;
-
-      console.log(existedData);
 
       if (existedData) setAleadyExist(true);
     };
@@ -125,7 +126,7 @@ export default function City() {
 
       router.push("/list");
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -135,7 +136,7 @@ export default function City() {
       await AsyncStorage.removeItem(`city-${cityID}`);
       router.push("/list");
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
   // weatherID value

@@ -20,6 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import getLocalDayTime from "@/hooks/getLocalDayTime";
 
+import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import Animated, {
@@ -37,7 +38,13 @@ export default function List() {
   const listContext = useContext(ListContext);
   if (!listContext)
     throw new Error("listContext must be used within EditProvider");
-  const { isEditOpen, textInputPressIn, setTextInputPressIn } = listContext;
+  const {
+    isEditOpen,
+    textInputPressIn,
+    setTextInputPressIn,
+    searchInput,
+    setSearchInput,
+  } = listContext;
 
   /** router */
   const router = useRouter();
@@ -49,6 +56,11 @@ export default function List() {
 
   /** Data for favorite cities */
   const [cities, setCities] = useState([{}]);
+
+  // Clear search input when entering the list page
+  useEffect(() => {
+    setSearchInput(null);
+  }, [setSearchInput]);
 
   /** Capitalize function */
   const capitalizeDesc = (desc: string) => {
@@ -88,7 +100,6 @@ export default function List() {
 
   /** filter */
 
-  const [searchInput, setSearchInput] = useState<string | null>(null);
   const [filterCities, setFilteredCities] = useState<
     { id: number; name: string }[]
   >([]);
@@ -176,14 +187,20 @@ export default function List() {
   const cancelOpacity = useSharedValue(0);
 
   useEffect(() => {
-    if (textInputPressIn || filterCities.length > 0) {
+    if (textInputPressIn || filterCities.length > 0 || searchInput) {
       cancelWidth.value = withTiming(70, { duration: 300 });
       cancelOpacity.value = withTiming(1, { duration: 100 });
     } else {
       cancelWidth.value = withTiming(0, { duration: 300 });
       cancelOpacity.value = withTiming(0, { duration: 100 });
     }
-  }, [cancelWidth, filterCities.length, textInputPressIn, cancelOpacity]);
+  }, [
+    cancelWidth,
+    filterCities.length,
+    textInputPressIn,
+    cancelOpacity,
+    searchInput,
+  ]);
 
   const animatedCancelStyle = useAnimatedStyle(() => ({
     width: cancelWidth.value,
@@ -192,23 +209,22 @@ export default function List() {
 
   // Animation for Title
   const titleHeight = useSharedValue(1);
-    const titleOpacity = useSharedValue(0);
+  const titleOpacity = useSharedValue(0);
 
   useEffect(() => {
-    if (!textInputPressIn && filterCities?.length === 0) {
+    if (!textInputPressIn && !searchInput && filterCities?.length === 0) {
       titleHeight.value = withTiming(50, { duration: 300 });
-            titleOpacity.value = withTiming(1, { duration: 100 });
+      titleOpacity.value = withTiming(1, { duration: 100 });
     } else {
       titleHeight.value = withTiming(0, { duration: 300 });
-            titleOpacity.value = withTiming(0, { duration: 100 });
+      titleOpacity.value = withTiming(0, { duration: 100 });
     }
+  }, [filterCities, textInputPressIn, titleHeight, titleOpacity, searchInput]);
 
-  },[filterCities, textInputPressIn, titleHeight,titleOpacity]);
-
-   const animatedTitleStyle = useAnimatedStyle(() => ({
-      height: titleHeight.value,
-      opacity: titleOpacity.value
-    }))
+  const animatedTitleStyle = useAnimatedStyle(() => ({
+    height: titleHeight.value,
+    opacity: titleOpacity.value,
+  }));
 
   return (
     <Fragment>
@@ -221,21 +237,19 @@ export default function List() {
           alignItems: "center",
         }}
       >
-
-          <Animated.Text
-            className={`${
-              theme === "light" ? "text-black" : "text-white"
-            } text-[40px] font-bold text-start w-full px-6 `}
-            style={animatedTitleStyle}
-          >
-            Weather
-          </Animated.Text>
-
+        <Animated.Text
+          className={`${
+            theme === "light" ? "text-black" : "text-white"
+          } text-[40px] font-bold text-start w-full px-6 `}
+          style={animatedTitleStyle}
+        >
+          Weather
+        </Animated.Text>
 
         <View className="w-full flex-1 ">
           {/* TextInput */}
           <View
-            className={`flex-row w-full items-center px-6 mb-5 ${textInputPressIn ? "mt-0" : " mt-5"}`}
+            className={`flex-row w-full items-center px-6 mb-5 ${textInputPressIn || searchInput ? "mt-0" : " mt-5"}`}
           >
             <TextInput
               returnKeyType={"search"}
@@ -251,6 +265,8 @@ export default function List() {
               onFocus={() => setTextInputPressIn(true)}
               onBlur={() => setTextInputPressIn(false)}
               ref={textInputRef}
+              autoCorrect={false}
+              autoComplete="off"
             />
 
             <AnimatedPressable
@@ -260,6 +276,7 @@ export default function List() {
                 textInputRef.current?.clear();
                 setFilteredCities([]);
                 setTextInputPressIn(false);
+                setSearchInput(null);
                 textInputRef.current?.blur();
               }}
               style={animatedCancelStyle}
@@ -271,7 +288,7 @@ export default function List() {
           </View>
 
           {/* Show Filtered Cities */}
-          {filterCities?.length > 0 && (
+          {filterCities?.length > 0 && searchInput ? (
             <FlatList
               data={filterCities}
               renderItem={({
@@ -291,6 +308,29 @@ export default function List() {
               )}
               keyExtractor={(item: any) => item?.id}
             />
+          ) : filterCities?.length === 0 && searchInput ? (
+            // No results
+            <View
+              className={`w-full ${textInputPressIn ? "h-[50%]" : "h-[80%]"} items-center justify-center`}
+            >
+              <AntDesign
+                name="search1"
+                size={40}
+                color={theme === "light" ? "black" : "white"}
+              />
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-2xl`}
+              >
+                No Results
+              </Text>
+              <Text
+                className={`${theme === "light" ? "text-black" : "text-white"} mt-2`}
+              >
+                {`No results found for "${searchInput}"`}
+              </Text>
+            </View>
+          ) : (
+            <></>
           )}
 
           {/* Your favorite cities */}
@@ -298,7 +338,9 @@ export default function List() {
             contentContainerStyle={{ paddingBottom: 50 }}
             className="px-6 "
           >
-            {sortedCities?.length > 0 && filterCities?.length === 0 ? (
+            {sortedCities?.length > 0 &&
+            filterCities?.length === 0 &&
+            !searchInput ? (
               sortedCities?.map((v: any, i: number) => {
                 const { isNight } = getLocalDayTime(v);
                 const desc = v?.weather?.[0]?.description ?? "";

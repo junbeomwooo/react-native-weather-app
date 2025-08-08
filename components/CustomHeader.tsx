@@ -16,13 +16,14 @@ export default function CustomHeader({ title }: { title?: string }) {
   const listContext = useContext(ListContext);
   if (!listContext)
     throw new Error("EditContext must be used within EditProvider");
-  const { isEditOpen, setIsEditOpen, textInputPressIn } = listContext;
+  const { isEditOpen, setIsEditOpen, textInputPressIn, searchInput } = listContext;
 
   const textColor = theme === "light" ? "text-black" : "text-white";
   const iconColor = theme === "light" ? "black" : "white";
 
   const pathname = usePathname();
   const router = useRouter();
+
 
   return (
     <SafeAreaView
@@ -35,7 +36,7 @@ export default function CustomHeader({ title }: { title?: string }) {
       }}
     >
       <View
-        className={`flex-row justify-between items-center ${textInputPressIn && "hidden"}`}
+        className={`flex-row justify-between items-center ${textInputPressIn && "hidden"} ${(pathname === "/list" && searchInput) ? "hidden" : null }`}
       >
         {/* left */}
         {pathname === "/" ? (

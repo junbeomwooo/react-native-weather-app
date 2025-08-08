@@ -5,6 +5,9 @@ export type EditContextType = {
   setIsEditOpen: React.Dispatch<React.SetStateAction<boolean>>;
   textInputPressIn: boolean;
   setTextInputPressIn: React.Dispatch<React.SetStateAction<boolean>>;
+  searchInput: string | null;
+  setSearchInput: React.Dispatch<React.SetStateAction<string | null>>;
+
 };
 
 export const ListContext = createContext<EditContextType | undefined>(
@@ -21,8 +24,20 @@ export const ListProvider = ({ children }: { children: ReactNode }) => {
   // State value for checking if user is focusing on textInput
   const [textInputPressIn, setTextInputPressIn] = useState(false);
 
+  // State value for seaching input
+  const [searchInput, setSearchInput] = useState<string | null>(null);
+
   return (
-    <ListContext.Provider value={{ isEditOpen, setIsEditOpen, textInputPressIn, setTextInputPressIn }}>
+    <ListContext.Provider
+      value={{
+        isEditOpen,
+        setIsEditOpen,
+        textInputPressIn,
+        setTextInputPressIn,
+        searchInput,
+        setSearchInput
+      }}
+    >
       {children}
     </ListContext.Provider>
   );

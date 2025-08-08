@@ -75,6 +75,8 @@ export default function Index() {
   /** Get data */
   useEffect(() => {
     async function getCurrentLocation() {
+
+      try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         permissionDenied(
@@ -143,6 +145,9 @@ export default function Index() {
           }
         })
       );
+      } catch (err) {
+        console.error(err);
+      }
     }
     getCurrentLocation();
   }, [WEATHER_API_KEY, setSunrise, setSunset]);
