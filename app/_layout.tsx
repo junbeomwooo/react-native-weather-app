@@ -53,11 +53,12 @@ export default function RootLayout() {
               // },
             }}
           >
-            <Stack.Screen name="list"  />
+            <Stack.Screen name="list" />
             <Stack.Screen
               name="city/[cityID]"
               options={{ headerShown: false }}
             />
+            <Stack.Screen name="map" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
           </Stack>
         </ListProvider>

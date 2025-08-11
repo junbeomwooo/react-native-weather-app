@@ -16,14 +16,14 @@ export default function CustomHeader({ title }: { title?: string }) {
   const listContext = useContext(ListContext);
   if (!listContext)
     throw new Error("EditContext must be used within EditProvider");
-  const { isEditOpen, setIsEditOpen, textInputPressIn, searchInput } = listContext;
+  const { isEditOpen, setIsEditOpen, textInputPressIn, searchInput } =
+    listContext;
 
   const textColor = theme === "light" ? "text-black" : "text-white";
   const iconColor = theme === "light" ? "black" : "white";
 
   const pathname = usePathname();
   const router = useRouter();
-
 
   return (
     <SafeAreaView
@@ -36,12 +36,12 @@ export default function CustomHeader({ title }: { title?: string }) {
       }}
     >
       <View
-        className={`flex-row justify-between items-center ${textInputPressIn && "hidden"} ${(pathname === "/list" && searchInput) ? "hidden" : null }`}
+        className={`flex-row justify-between items-center ${textInputPressIn && "hidden"} ${pathname === "/list" && searchInput ? "hidden" : null}`}
       >
         {/* left */}
         {pathname === "/" ? (
-          <Pressable hitSlop={5}>
-            <Ionicons name="menu-outline" size={28} color={iconColor} />
+          <Pressable onPress={() => router.push("/map")} hitSlop={5}>
+            <Ionicons name="map-outline" size={28} color={iconColor} />
           </Pressable>
         ) : (
           <Pressable onPress={() => router.push("/")} hitSlop={5}>

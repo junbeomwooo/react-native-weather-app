@@ -281,7 +281,7 @@ export default function List() {
               }}
               style={animatedCancelStyle}
             >
-              <Text className="text-lg font-normal" numberOfLines={1}>
+              <Text className={`text-lg font-normal ${theme === "light" ? "text-black" : "text-white"} `} numberOfLines={1}>
                 Cancle
               </Text>
             </AnimatedPressable>
