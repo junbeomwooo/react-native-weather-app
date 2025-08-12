@@ -1,5 +1,9 @@
+import { LocationContext } from "@/context/LocationContext";
+import { ThemeContext } from "@/context/ThemeContext";
 import { useRouter } from "expo-router";
-import { Dimensions, ImageBackground, Pressable, Text } from "react-native";
+import { useContext } from "react";
+import { Dimensions, Pressable, Text } from "react-native";
+import MapView from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Map() {
@@ -16,24 +20,31 @@ export default function Map() {
 
   const router = useRouter();
 
+  const { theme } = useContext(ThemeContext);
+  const {
+    latlng: [lat, lng],
+  } = useContext(LocationContext);
+
   return (
-    <SafeAreaView className="bg-black">
-      <ImageBackground
-        source={{ uri: url }}
-        style={{
-          width: WINDOW_WIDTH,
-          height: WINDOW_HEIGHT,
-          backgroundColor: "black",
+    <SafeAreaView
+      className={`${theme === "light" ? "bg-white" : "bg-black"} flex-1`}
+    >
+      <MapView
+        style={{ flex: 1 }}
+        initialRegion={{
+          latitude: lat,
+          longitude: lng,
+          latitudeDelta: 0.6,
+          longitudeDelta: 0.6,
         }}
+      />
+      {/* Done */}
+      <Pressable
+        className="w-[70px] h-[35px] bg-white justify-center items-center mt-4 ml-4"
+        onPress={() => router.back()}
       >
-        {/* Done */}
-        <Pressable
-          className="w-[70px] h-[35px] bg-white justify-center items-center mt-4 ml-4"
-          onPress={() => router.back()}
-        >
-          <Text className=" text-xl">Done</Text>
-        </Pressable>
-      </ImageBackground>
+        <Text className=" text-xl">Done</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }

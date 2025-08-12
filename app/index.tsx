@@ -1,3 +1,4 @@
+import { LocationContext } from "@/context/LocationContext";
 import { ThemeContext } from "@/context/ThemeContext";
 
 import {
@@ -27,6 +28,7 @@ import getLocalDayTime from "@/hooks/getLocalDayTime";
 
 export default function Index() {
   const { theme, setSunrise, setSunset } = useContext(ThemeContext);
+  const { setLatLng } = useContext(LocationContext);
 
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -75,82 +77,85 @@ export default function Index() {
   /** Get data */
   useEffect(() => {
     async function getCurrentLocation() {
-
       try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        permissionDenied(
-          "Permission Denied",
-          "Permission to access location was denied"
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          permissionDenied(
+            "Permission Denied",
+            "Permission to access location was denied"
+          );
+          return;
+        }
+
+        let {
+          coords: { latitude, longitude },
+        } = await Location.getCurrentPositionAsync({ accuracy: 5 });
+
+
+        // Save cordinate value into context 
+        setLatLng([latitude, longitude]);
+
+        const [current, hourly] = await Promise.all([
+          fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
+          ),
+          fetch(
+            `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
+          ),
+        ]);
+
+        /** if you want to get location info through Location from expo
+         *  No need, Because the weather api provide simple location info as well
+         */
+        //   const address = await Location.reverseGeocodeAsync({
+        //   latitude,
+        //   longitude,
+        // });
+
+        const [currentWeatherJSON, hourlyWeatherJSON] = await Promise.all([
+          current.json(),
+          hourly.json(),
+        ]);
+
+        const city = currentWeatherJSON?.name ? currentWeatherJSON?.name : "";
+
+        setLocation(city);
+
+        saveIntoAsyncStorage(currentWeatherJSON);
+
+        // set Sunrise, Sunset time for React Context
+
+        // Sunrise hour
+        const sunriseDate = new Date(currentWeatherJSON?.sys?.sunrise * 1000);
+        const sunriseHours = sunriseDate.getHours();
+
+        // Sunset hour
+        const sunsetDate = new Date(currentWeatherJSON?.sys?.sunset * 1000);
+        const sunsetHours = sunsetDate.getHours();
+
+        setSunrise(sunriseHours);
+        setSunset(sunsetHours);
+
+        // current weather
+        setCurrentWeather(currentWeatherJSON);
+
+        // hourly weather
+        setHourlyWeather(hourlyWeatherJSON?.list?.slice(0, 10));
+
+        //  daily weather
+        setDailyWeather(
+          hourlyWeatherJSON?.list?.filter((v: any) => {
+            if (v?.dt_txt?.includes("12:00:00")) {
+              return v;
+            }
+          })
         );
-        return;
-      }
-
-      let {
-        coords: { latitude, longitude },
-      } = await Location.getCurrentPositionAsync({ accuracy: 5 });
-
-      const [current, hourly] = await Promise.all([
-        fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
-        ),
-        fetch(
-          `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
-        ),
-      ]);
-
-      /** if you want to get location info through Location from expo
-       *  No need, Because the weather api provide simple location info as well
-       */
-      //   const address = await Location.reverseGeocodeAsync({
-      //   latitude,
-      //   longitude,
-      // });
-
-      const [currentWeatherJSON, hourlyWeatherJSON] = await Promise.all([
-        current.json(),
-        hourly.json(),
-      ]);
-
-      const city = currentWeatherJSON?.name ? currentWeatherJSON?.name : "";
-
-      setLocation(city);
-
-      saveIntoAsyncStorage(currentWeatherJSON);
-
-      // set Sunrise, Sunset time for React Context
-
-      // Sunrise hour
-      const sunriseDate = new Date(currentWeatherJSON?.sys?.sunrise * 1000);
-      const sunriseHours = sunriseDate.getHours();
-
-      // Sunset hour
-      const sunsetDate = new Date(currentWeatherJSON?.sys?.sunset * 1000);
-      const sunsetHours = sunsetDate.getHours();
-
-      setSunrise(sunriseHours);
-      setSunset(sunsetHours);
-
-      // current weather
-      setCurrentWeather(currentWeatherJSON);
-
-      // hourly weather
-      setHourlyWeather(hourlyWeatherJSON?.list?.slice(0, 10));
-
-      //  daily weather
-      setDailyWeather(
-        hourlyWeatherJSON?.list?.filter((v: any) => {
-          if (v?.dt_txt?.includes("12:00:00")) {
-            return v;
-          }
-        })
-      );
       } catch (err) {
         console.error(err);
       }
     }
     getCurrentLocation();
-  }, [WEATHER_API_KEY, setSunrise, setSunset]);
+  }, [WEATHER_API_KEY, setSunrise, setSunset, setLatLng]);
 
   const navigation = useNavigation();
 
@@ -177,6 +182,7 @@ export default function Index() {
   );
 
   const { sunrise, sunset } = getLocalDayTime(currentWeather);
+
 
   return (
     <ScrollView

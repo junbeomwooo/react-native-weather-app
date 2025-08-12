@@ -1,6 +1,7 @@
 import CustomHeader from "@/components/CustomHeader";
 
 import { ListProvider } from "@/context/EditContext";
+import { LocationProvider } from "@/context/LocationContext";
 import { ThemeContext } from "@/context/ThemeContext";
 
 import "@/global.css";
@@ -43,6 +44,7 @@ export default function RootLayout() {
         }}
       >
         <ListProvider>
+          <LocationProvider>
           <Stack
             screenOptions={{
               header: (props) => {
@@ -61,6 +63,7 @@ export default function RootLayout() {
             <Stack.Screen name="map" options={{ headerShown: false }} />
             <Stack.Screen name="+not-found" />
           </Stack>
+          </LocationProvider>
         </ListProvider>
       </ThemeContext.Provider>
     </SafeAreaProvider>
