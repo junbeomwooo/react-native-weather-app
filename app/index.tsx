@@ -50,19 +50,34 @@ export default function Index() {
 
   /**  To save in to Async storage */
   const saveIntoAsyncStorage = async (params: any) => {
+    /** 
+        *  Find local time based on user's device time
+          * padStart(targetLength, padString)
+	        •	targetLength: length 2 
+	        •	padString: "0"
+      */
+
+    const todayLocal = new Date();
+    const yyyy = todayLocal.getFullYear();
+    const mm = String(todayLocal.getMonth() + 1).padStart(2, "0");
+    const dd = String(todayLocal.getDate()).padStart(2, "0");
+    const todayString = `${yyyy}-${mm}-${dd}`;
+
     const currentLocation = {
       ...params,
       myLocation: true,
+      saveDate: todayString
     };
     try {
       const existing = await AsyncStorage.getItem("myLocation");
 
       if (existing) {
         const parsed = JSON.parse(existing);
+        const savedData = parsed?.saveDate;
 
         // if its same city, do not save
-        if (parsed.id === params.id) {
-          console.log("Same location, skipping save.");
+        if ((parsed.id === params.id) && (todayString === savedData)) {
+          console.log("Same location and same date, skipping save.");
           return;
         }
       }
@@ -91,8 +106,7 @@ export default function Index() {
           coords: { latitude, longitude },
         } = await Location.getCurrentPositionAsync({ accuracy: 5 });
 
-
-        // Save cordinate value into context 
+        // Save cordinate value into context
         setLatLng([latitude, longitude]);
 
         const [current, hourly] = await Promise.all([
@@ -125,16 +139,10 @@ export default function Index() {
 
         // set Sunrise, Sunset time for React Context
 
-        // Sunrise hour
-        const sunriseDate = new Date(currentWeatherJSON?.sys?.sunrise * 1000);
-        const sunriseHours = sunriseDate.getHours();
+        const { sunrise, sunset } = getLocalDayTime(currentWeatherJSON);
 
-        // Sunset hour
-        const sunsetDate = new Date(currentWeatherJSON?.sys?.sunset * 1000);
-        const sunsetHours = sunsetDate.getHours();
-
-        setSunrise(sunriseHours);
-        setSunset(sunsetHours);
+        setSunrise(sunrise);
+        setSunset(sunset);
 
         // current weather
         setCurrentWeather(currentWeatherJSON);
@@ -182,7 +190,6 @@ export default function Index() {
   );
 
   const { sunrise, sunset } = getLocalDayTime(currentWeather);
-
 
   return (
     <ScrollView

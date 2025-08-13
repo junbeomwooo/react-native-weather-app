@@ -249,7 +249,9 @@ export default function List() {
         <View className="w-full flex-1 ">
           {/* TextInput */}
           <View
-            className={`flex-row w-full items-center px-6 mb-5 ${textInputPressIn || searchInput ? "mt-0" : " mt-5"}`}
+            className={`flex-row w-full items-center px-6 mb-5 ${
+              textInputPressIn || searchInput ? "mt-0" : " mt-5"
+            }`}
           >
             <TextInput
               returnKeyType={"search"}
@@ -281,7 +283,12 @@ export default function List() {
               }}
               style={animatedCancelStyle}
             >
-              <Text className={`text-lg font-normal ${theme === "light" ? "text-black" : "text-white"} `} numberOfLines={1}>
+              <Text
+                className={`text-lg font-normal ${
+                  theme === "light" ? "text-black" : "text-white"
+                } `}
+                numberOfLines={1}
+              >
                 Cancle
               </Text>
             </AnimatedPressable>
@@ -311,7 +318,9 @@ export default function List() {
           ) : filterCities?.length === 0 && searchInput ? (
             // No results
             <View
-              className={`w-full ${textInputPressIn ? "h-[50%]" : "h-[80%]"} items-center justify-center`}
+              className={`w-full ${
+                textInputPressIn ? "h-[50%]" : "h-[80%]"
+              } items-center justify-center`}
             >
               <AntDesign
                 name="search1"
@@ -319,12 +328,16 @@ export default function List() {
                 color={theme === "light" ? "black" : "white"}
               />
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} font-semibold text-2xl`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } font-semibold text-2xl`}
               >
                 No Results
               </Text>
               <Text
-                className={`${theme === "light" ? "text-black" : "text-white"} mt-2`}
+                className={`${
+                  theme === "light" ? "text-black" : "text-white"
+                } mt-2`}
               >
                 {`No results found for "${searchInput}"`}
               </Text>
@@ -342,8 +355,13 @@ export default function List() {
             filterCities?.length === 0 &&
             !searchInput ? (
               sortedCities?.map((v: any, i: number) => {
-                const { isNight } = getLocalDayTime(v);
+                const { isNight, localHour, sunrise, sunset } =
+                  getLocalDayTime(v);
                 const desc = v?.weather?.[0]?.description ?? "";
+                if (i === 0)
+                  console.log(
+                    `sunrise:${sunrise} ::: sunset:${sunset} ::: isNight:::${isNight} localHour: ${localHour} `
+                  );
 
                 return (
                   <View key={i} className="flex-row items-center flex-1">
@@ -359,7 +377,9 @@ export default function List() {
 
                     {/* List */}
                     <AnimatedPressable
-                      className={`mt-6 rounded-2xl flex-row px-5 py-3 justify-between flex-1 ${textInputPressIn && "opacity-70"}`}
+                      className={`mt-6 rounded-2xl flex-row px-5 py-3 justify-between flex-1 ${
+                        textInputPressIn && "opacity-70"
+                      }`}
                       style={[animatedStyle, { overflow: "hidden" }]}
                       onPress={() =>
                         v?.myLocation === true
@@ -368,6 +388,7 @@ export default function List() {
                       }
                     >
                       <View className="absolute top-0 left-0 right-0 bottom-0 overflow-hidden rounded-2xl ">
+                        {/* Gradient Aniamtion Background */}
                         <Animated.View
                           style={[
                             {
@@ -427,7 +448,9 @@ export default function List() {
                           <Text
                             className={`${
                               isNight ? "text-white" : "text-black"
-                            } font-medium text-[12px] ${isEditOpen && "hidden"}`}
+                            } font-medium text-[12px] ${
+                              isEditOpen && "hidden"
+                            }`}
                           >
                             {capitalizeDesc(desc)}
                           </Text>
@@ -447,7 +470,9 @@ export default function List() {
                           <Text
                             className={`${
                               isNight ? "text-white" : "text-black"
-                            } font-medium text-[12px] ${isEditOpen && "hidden"}`}
+                            } font-medium text-[12px] ${
+                              isEditOpen && "hidden"
+                            }`}
                           >
                             Feels_like: {Math.round(v?.main?.feels_like)}°
                           </Text>

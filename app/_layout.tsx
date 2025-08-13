@@ -45,24 +45,24 @@ export default function RootLayout() {
       >
         <ListProvider>
           <LocationProvider>
-          <Stack
-            screenOptions={{
-              header: (props) => {
-                return <CustomHeader title={props.options.title} />;
-              },
-              // contentStyle: {
-              //   backgroundColor: theme === "light" ? "#fed500" : "#080830",
-              // },
-            }}
-          >
-            <Stack.Screen name="list" />
-            <Stack.Screen
-              name="city/[cityID]"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="map" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
+            <Stack
+              screenOptions={{
+                header: (props) => {
+                  return <CustomHeader title={props.options.title} />;
+                },
+                // contentStyle: {
+                //   backgroundColor: theme === "light" ? "#fed500" : "#080830",
+                // },
+              }}
+            >
+              <Stack.Screen name="list" />
+              <Stack.Screen
+                name="city/[cityID]"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen name="map" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
           </LocationProvider>
         </ListProvider>
       </ThemeContext.Provider>
