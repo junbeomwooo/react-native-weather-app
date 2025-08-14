@@ -49,7 +49,11 @@ export default function Index() {
     ]);
 
   /**  To save in to Async storage */
-  const saveIntoAsyncStorage = async (params: any) => {
+  const saveIntoAsyncStorage = async (
+    cityID: number,
+    cityName: string,
+    coords: any
+  ) => {
     /** 
         *  Find local time based on user's device time
           * padStart(targetLength, padString)
@@ -61,12 +65,15 @@ export default function Index() {
     const yyyy = todayLocal.getFullYear();
     const mm = String(todayLocal.getMonth() + 1).padStart(2, "0");
     const dd = String(todayLocal.getDate()).padStart(2, "0");
-    const todayString = `${yyyy}-${mm}-${dd}`;
+    const hh = String(todayLocal.getHours()).padStart(2, "0");
+    const todayString = `${yyyy}-${mm}-${dd} ${hh}:00`;
 
     const currentLocation = {
-      ...params,
       myLocation: true,
-      saveDate: todayString
+      cityIdFromAPI: cityID,
+      cityName: cityName,
+      saveDate: todayString,
+      coords: coords,
     };
     try {
       const existing = await AsyncStorage.getItem("myLocation");
@@ -76,7 +83,7 @@ export default function Index() {
         const savedData = parsed?.saveDate;
 
         // if its same city, do not save
-        if ((parsed.id === params.id) && (todayString === savedData)) {
+        if (parsed.cityIdFromAPI === cityID && todayString === savedData) {
           console.log("Same location and same date, skipping save.");
           return;
         }
@@ -135,7 +142,10 @@ export default function Index() {
 
         setLocation(city);
 
-        saveIntoAsyncStorage(currentWeatherJSON);
+        saveIntoAsyncStorage(currentWeatherJSON.id, currentWeatherJSON.name, {
+          latitude: latitude,
+          longitude: longitude,
+        });
 
         // set Sunrise, Sunset time for React Context
 

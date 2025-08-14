@@ -76,7 +76,7 @@ export default function CustomHeader({ title }: { title?: string }) {
             </Text>
           </Pressable>
         ) : (
-          <Pressable hitSlop={5} onPress={() => setIsEditOpen(true)}>
+          <Pressable hitSlop={5} onPress={() => {setIsEditOpen(true)}}>
             <AntDesign name="edit" size={28} color={iconColor} />
           </Pressable>
         )}

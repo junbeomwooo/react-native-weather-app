@@ -24,6 +24,7 @@ export default function RootLayout() {
     console.log(
       ` sunrise: ${sunrise} , sunset: ${sunset} , nowHours: ${nowHour}`
     );
+
     // when its after sunset || its before sunrise
     if (nowHour >= sunset || nowHour < sunrise) {
       setTheme("dark");

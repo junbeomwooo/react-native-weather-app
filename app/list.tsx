@@ -57,6 +57,8 @@ export default function List() {
   /** Data for favorite cities */
   const [cities, setCities] = useState([{}]);
 
+  const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
+
   // Clear search input when entering the list page
   useEffect(() => {
     setSearchInput(null);
@@ -72,7 +74,7 @@ export default function List() {
       .join(" ");
   };
 
-  /** Recieve asnyce storage data */
+  /** Recieve data from asnyce storage and API  */
   useEffect(() => {
     const getData = async () => {
       try {
@@ -90,13 +92,34 @@ export default function List() {
           }
         );
 
-        setCities(parsed);
-      } catch (error) {
-        console.error("Failed to load all cities:", error);
+        const request = parsed?.map((v: any) => {
+          if (!v?.coords) return null;
+          const { latitude, longitude } = v?.coords;
+          return fetch(
+            `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric`
+          ).then((payload) => payload.json());
+        });
+
+        const results = await Promise.all(request);
+
+        const city = results.map((v: any, i: number) => {
+          const storageData = parsed[i];
+          return {
+            ...v,
+            cityID: storageData.cityID || storageData.cityIdFromAPI,
+            ...(storageData.myLocation
+              ? { myLocation: storageData.myLocation }
+              : {}),
+          };
+        });
+        setCities(city);
+      } catch (err) {
+        console.error(err);
       }
     };
+
     getData();
-  }, []);
+  }, [WEATHER_API_KEY]);
 
   /** filter */
 
@@ -355,13 +378,9 @@ export default function List() {
             filterCities?.length === 0 &&
             !searchInput ? (
               sortedCities?.map((v: any, i: number) => {
-                const { isNight, localHour, sunrise, sunset } =
+                const { isNight } =
                   getLocalDayTime(v);
                 const desc = v?.weather?.[0]?.description ?? "";
-                if (i === 0)
-                  console.log(
-                    `sunrise:${sunrise} ::: sunset:${sunset} ::: isNight:::${isNight} localHour: ${localHour} `
-                  );
 
                 return (
                   <View key={i} className="flex-row items-center flex-1">

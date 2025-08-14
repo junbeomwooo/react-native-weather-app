@@ -37,6 +37,7 @@ export default function City() {
   const [currentWeather, setCurrentWeather] = useState<any>({});
   const [hourlyWeather, setHourlyWeather] = useState([]);
   const [dailyWeather, setDailyWeather] = useState([]);
+  const [lanlng, setLanLng] = useState({});
 
   // Check if this city exists in your favorite city list
   const [alreadyExist, setAleadyExist] = useState(false);
@@ -54,8 +55,11 @@ export default function City() {
     if (!seacrhedCity) return;
     async function getCityWeather() {
       try {
-        const [{ latitude, longitude }] =
-          await Location.geocodeAsync(seacrhedCity);
+        const [{ latitude, longitude }] = await Location.geocodeAsync(
+          seacrhedCity
+        );
+
+        setLanLng({ latitude: latitude, longitude: longitude });
 
         const [current, hourly] = await Promise.all([
           fetch(
@@ -113,9 +117,18 @@ export default function City() {
   /** Save into AsyncStorage for Header */
   const SaveIntoAsyncStorage = async () => {
     const address = {
-      ...currentWeather,
       cityID: cityNumber,
+      cityName: cityName,
+      coords: lanlng,
     };
+
+    const keys = await AsyncStorage.getAllKeys();
+
+    if (keys.length >= 5) {
+      Alert.alert("Cannot save more than 5 favorite cities.");
+      return;
+    }
+
     try {
       if (alreadyExist) {
         Alert.alert("This city has already been added to your favorites.");
