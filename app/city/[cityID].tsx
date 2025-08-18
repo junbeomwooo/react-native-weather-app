@@ -26,15 +26,18 @@ import getLocalDayTime from "@/hooks/getLocalDayTime";
 import major_cities from "@/assets/major_cities_200.json";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { CurrnetWeatherData, DailyHourlyWeatherData } from "..";
+
+
 export default function City() {
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
 
   const router = useRouter();
 
-  const [location, setLocation] = useState<any>(null);
+  const [location, setLocation] = useState<string | null>(null);
 
-  const [currentWeather, setCurrentWeather] = useState<any>({});
+  const [currentWeather, setCurrentWeather] = useState<CurrnetWeatherData | null>(null);
   const [hourlyWeather, setHourlyWeather] = useState([]);
   const [dailyWeather, setDailyWeather] = useState([]);
   const [lanlng, setLanLng] = useState({});
@@ -45,7 +48,7 @@ export default function City() {
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
   const { cityID } = useGlobalSearchParams();
-  const cityObj = major_cities?.find((v: any) => v.id === Number(cityID));
+  const cityObj = major_cities?.find((v: {id:number, name:string}) => v.id === Number(cityID));
   const cityName = cityObj?.name;
   const cityNumber = cityObj?.id;
   const seacrhedCity = Array.isArray(cityName) ? cityName[0] : cityName;
@@ -87,7 +90,7 @@ export default function City() {
 
         //  daily weather
         setDailyWeather(
-          hourlyWeatherJSON?.list?.filter((v: any) => {
+          hourlyWeatherJSON?.list?.filter((v: DailyHourlyWeatherData) => {
             if (v?.dt_txt?.includes("12:00:00")) {
               return v;
             }
@@ -122,14 +125,14 @@ export default function City() {
       coords: lanlng,
     };
 
-    const keys = await AsyncStorage.getAllKeys();
-
-    if (keys.length >= 5) {
-      Alert.alert("Cannot save more than 5 favorite cities.");
-      return;
-    }
-
     try {
+      const keys = await AsyncStorage.getAllKeys();
+
+      if (keys.length >= 5) {
+        Alert.alert("Cannot save more than 5 favorite cities.");
+        return;
+      }
+
       if (alreadyExist) {
         Alert.alert("This city has already been added to your favorites.");
         return;
@@ -164,17 +167,18 @@ export default function City() {
 
   // Average temperature for 8 hours
   const averageTemp = Math.round(
-    hourlyWeather?.reduce((acc: number, items: any) => {
+    hourlyWeather?.reduce((acc: number, items: DailyHourlyWeatherData) => {
       return acc + (items?.main?.temp ?? 0);
     }, 0) / hourlyWeather.length
   );
 
   const { sunrise, sunset, isNight } = getLocalDayTime(currentWeather);
+  const title = location ? location : ""
 
   return (
     <Fragment>
       <CityHeader
-        title={location}
+        title={title}
         isNight={isNight}
         alearyExist={alreadyExist}
         onClickSaveIntoAsync={SaveIntoAsyncStorage}
@@ -269,7 +273,7 @@ export default function City() {
               </Text>
 
               <ScrollView horizontal={true}>
-                {hourlyWeather?.map((v: any, i: number) => {
+                {hourlyWeather?.map((v: DailyHourlyWeatherData, i: number) => {
                   /** Time format */
                   const hours = new Date(v?.dt_txt).getHours();
                   const period = hours >= 12 ? "pm" : "am";
@@ -278,7 +282,7 @@ export default function City() {
 
                   /** Weather icon */
                   const weatherIcons =
-                    v?.weather?.length > 0 ? v?.weather[0]?.id : null;
+                    v?.weather?.length > 0 ? v?.weather[0]?.id : 0;
 
                   return (
                     <View key={i} className="mx-3">
@@ -341,7 +345,7 @@ export default function City() {
               </Text>
 
               <ScrollView horizontal={true}>
-                {dailyWeather?.map((v: any, i: number) => {
+                {dailyWeather?.map((v: DailyHourlyWeatherData, i: number) => {
                   const hours = new Date(v?.dt_txt).getHours();
 
                   /** day format */
@@ -351,7 +355,7 @@ export default function City() {
 
                   /** Weather icon */
                   const weatherIcons =
-                    v?.weather?.length > 0 ? v?.weather[0]?.id : null;
+                    v?.weather?.length > 0 ? v?.weather[0]?.id : 0;
 
                   return (
                     <View key={i} className="mx-3">

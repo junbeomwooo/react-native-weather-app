@@ -108,8 +108,8 @@ export  function getWeatherIconsByTime(
   weatherId: number,
   hours: number,
   size: number,
-  sunset: any,
-  sunrise: any,
+  sunset: number,
+  sunrise: number,
   theme:"light" | "dark" | null
 ) {
 

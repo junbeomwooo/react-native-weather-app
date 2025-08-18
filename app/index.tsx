@@ -26,17 +26,84 @@ import {
 
 import getLocalDayTime from "@/hooks/getLocalDayTime";
 
+export interface CurrnetWeatherData {
+  base: string;
+  clouds: { all: number };
+  cod: number;
+  coord: { lat: number; lon: number };
+  dt: number;
+  id: number;
+  main: {
+    feels_like: number;
+    grnd_level: number;
+    humidity: number;
+    pressure: number;
+    sea_level: number;
+    temp: number;
+    temp_max: number;
+    temp_min: number;
+  };
+  name: string;
+  sys: {
+    country: string;
+    id: number;
+    sunrise: number;
+    sunset: number;
+    type: number;
+  };
+  timezone: number;
+  visibility: number;
+  weather: {
+    description: string;
+    icon: string;
+    id: number;
+    main: string;
+  }[];
+  wind: { deg: number; speed: number };
+}
+
+export interface DailyHourlyWeatherData {
+ clouds: { all: number },
+  dt: number,
+  dt_txt: string,
+  main: {
+    feels_like: number,
+    grnd_level: number,
+    humidity: number,
+    pressure: number,
+    sea_level: number,
+    temp: number,
+    temp_kf: number,
+    temp_max: number,
+    temp_min: number
+  },
+  pop: number,
+  sys: { "pod": string },
+  visibility: number,
+  weather: [
+    { description: string, icon: string, id: number, main: string }
+  ],
+  wind: { deg: number, gust: number, speed: number }
+}
+
+interface CoordsData {
+  latitude: number;
+  longitude: number;
+}
+
 export default function Index() {
   const { theme, setSunrise, setSunset } = useContext(ThemeContext);
-  const { setLatLng } = useContext(LocationContext);
+  const { setLatLng, setMyLocationWeather } = useContext(LocationContext);
 
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
 
-  const [location, setLocation] = useState<any>(null);
+  const [location, setLocation] = useState<string | null>(null);
 
   /** For data */
-  const [currentWeather, setCurrentWeather] = useState<any>({});
+  const [currentWeather, setCurrentWeather] = useState<CurrnetWeatherData | null>(
+    null
+  );
   const [hourlyWeather, setHourlyWeather] = useState([]);
   const [dailyWeather, setDailyWeather] = useState([]);
 
@@ -52,7 +119,7 @@ export default function Index() {
   const saveIntoAsyncStorage = async (
     cityID: number,
     cityName: string,
-    coords: any
+    coords: CoordsData
   ) => {
     /** 
         *  Find local time based on user's device time
@@ -82,7 +149,7 @@ export default function Index() {
         const parsed = JSON.parse(existing);
         const savedData = parsed?.saveDate;
 
-        // if its same city, do not save
+        // if its same city and same time do not save
         if (parsed.cityIdFromAPI === cityID && todayString === savedData) {
           console.log("Same location and same date, skipping save.");
           return;
@@ -141,6 +208,7 @@ export default function Index() {
         const city = currentWeatherJSON?.name ? currentWeatherJSON?.name : "";
 
         setLocation(city);
+        setMyLocationWeather(currentWeatherJSON);
 
         saveIntoAsyncStorage(currentWeatherJSON.id, currentWeatherJSON.name, {
           latitude: latitude,
@@ -162,7 +230,7 @@ export default function Index() {
 
         //  daily weather
         setDailyWeather(
-          hourlyWeatherJSON?.list?.filter((v: any) => {
+          hourlyWeatherJSON?.list?.filter((v: DailyHourlyWeatherData) => {
             if (v?.dt_txt?.includes("12:00:00")) {
               return v;
             }
@@ -173,7 +241,7 @@ export default function Index() {
       }
     }
     getCurrentLocation();
-  }, [WEATHER_API_KEY, setSunrise, setSunset, setLatLng]);
+  }, [WEATHER_API_KEY, setSunrise, setSunset, setLatLng, setMyLocationWeather]);
 
   const navigation = useNavigation();
 
@@ -194,7 +262,7 @@ export default function Index() {
 
   // Average temperature for 8 hours
   const averageTemp = Math.round(
-    hourlyWeather?.reduce((acc: number, items: any) => {
+    hourlyWeather?.reduce((acc: number, items: DailyHourlyWeatherData) => {
       return acc + (items?.main?.temp ?? 0);
     }, 0) / hourlyWeather.length
   );
@@ -285,7 +353,8 @@ export default function Index() {
             </Text>
 
             <ScrollView horizontal={true}>
-              {hourlyWeather?.map((v: any, i: number) => {
+              {hourlyWeather?.map((v: DailyHourlyWeatherData, i: number) => {
+
                 /** Time format */
                 const hours = new Date(v?.dt_txt).getHours();
                 const period = hours >= 12 ? "pm" : "am";
@@ -294,7 +363,7 @@ export default function Index() {
 
                 /** Weather icon */
                 const weatherIcons =
-                  v?.weather?.length > 0 ? v?.weather[0]?.id : null;
+                  v?.weather?.length > 0 ? v?.weather[0]?.id : 0;
 
                 return (
                   <View key={i} className="mx-3">
@@ -357,7 +426,7 @@ export default function Index() {
             </Text>
 
             <ScrollView horizontal={true}>
-              {dailyWeather?.map((v: any, i: number) => {
+              {dailyWeather?.map((v: DailyHourlyWeatherData, i: number) => {
                 const hours = new Date(v?.dt_txt).getHours();
 
                 /** day format */
@@ -367,7 +436,7 @@ export default function Index() {
 
                 /** Weather icon */
                 const weatherIcons =
-                  v?.weather?.length > 0 ? v?.weather[0]?.id : null;
+                  v?.weather?.length > 0 ? v?.weather[0]?.id : 0;
 
                 return (
                   <View key={i} className="mx-3">

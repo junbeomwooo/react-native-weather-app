@@ -1,17 +1,17 @@
 import { LocationContext } from "@/context/LocationContext";
 import { ThemeContext } from "@/context/ThemeContext";
-import { useRouter } from "expo-router";
-import { useContext, useRef, useState } from "react";
-import { Dimensions, Pressable, Text, View } from "react-native";
-import MapView, { UrlTile } from "react-native-maps";
-import { SafeAreaView } from "react-native-safe-area-context";
-
 import Entypo from "@expo/vector-icons/Entypo";
+import Feather from "@expo/vector-icons/Feather";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
+import { useRouter } from "expo-router";
+import { useContext, useRef, useState } from "react";
+import { Dimensions, Pressable, Text, View } from "react-native";
+import MapView, { UrlTile } from "react-native-maps";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Map() {
   /** API key */
@@ -23,6 +23,10 @@ export default function Map() {
   /** router */
   const router = useRouter();
 
+  /** Context */
+  const {myLocationWeather} = useContext(LocationContext);
+  console.log(myLocationWeather);
+
   /** State value for Map layer type
    * - clouds_new
    * - precipitation_new
@@ -30,7 +34,9 @@ export default function Map() {
    * - wind_new
    * - temp_new
    */
+
   const [isLayerListOpen, setLayerListOpen] = useState(false);
+  const [selectedLayer, setSelectedLayer] = useState("clouds_new");
 
   const { theme } = useContext(ThemeContext);
   const {
@@ -66,14 +72,14 @@ export default function Map() {
           initialRegion={{
             latitude: lat,
             longitude: lng,
-            latitudeDelta: 6.5,
-            longitudeDelta: 6.5,
+            latitudeDelta: 13,
+            longitudeDelta: 13,
           }}
           ref={mapRef}
         >
           {/* Tile */}
           <UrlTile
-            urlTemplate={`https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=${WEATHER_API_KEY}`}
+            urlTemplate={`https://tile.openweathermap.org/map/${selectedLayer}/{z}/{x}/{y}.png?appid=${WEATHER_API_KEY}`}
           />
         </MapView>
 
@@ -108,7 +114,7 @@ export default function Map() {
             >
               <Entypo name="menu" size={23} color="black" />
             </Pressable>
-            {/* layer list */}
+            {/* map layer list */}
             <Pressable
               hitSlop={5}
               className="w-[47px] h-[47px] bg-white justify-center items-center rounded-lg mt-3"
@@ -117,14 +123,36 @@ export default function Map() {
               <Octicons name="stack" size={20} color="black" />
             </Pressable>
             {isLayerListOpen === true && (
-              <View className="w-[200px] h-auto bg-white mt-4 rounded-lg px-4">
-
+              <View className="w-[210px] h-auto bg-white mt-4 rounded-lg px-4">
                 {/* Clouds */}
                 <Pressable
-                  className="flex-row justify-between py-3"
+                  className="flex-row justify-between py-3 items-center"
                   hitSlop={5}
+                  onPress={() => {
+                    setSelectedLayer("clouds_new");
+                    setLayerListOpen(false);
+                  }}
                 >
-                  <Text className="text-lg">Clouds</Text>
+                  {/* check icon , layer title */}
+                  <View className="flex-row items-center">
+                    {selectedLayer === "clouds_new" ? (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="mr-2"
+                      />
+                    ) : (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="opacity-0 mr-2"
+                      />
+                    )}
+                    <Text className="text-lg">Clouds</Text>
+                  </View>
+                  {/* icons */}
                   <Ionicons name="cloud-outline" size={24} color="black" />
                 </Pressable>
                 {/* Hr */}
@@ -134,8 +162,31 @@ export default function Map() {
                 <Pressable
                   className="flex-row justify-between py-3"
                   hitSlop={5}
+                  onPress={() => {
+                    setSelectedLayer("precipitation_new");
+                    setLayerListOpen(false);
+                  }}
                 >
-                  <Text className="text-lg">Precipitation</Text>
+                  {/* check icon , layer title */}
+                  <View className="flex-row items-center">
+                    {selectedLayer === "precipitation_new" ? (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="mr-2"
+                      />
+                    ) : (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="opacity-0 mr-2"
+                      />
+                    )}
+                    <Text className="text-lg">Precipitation</Text>
+                  </View>
+                  {/* icons */}
                   <Ionicons name="umbrella-outline" size={24} color="black" />
                 </Pressable>
                 {/* Hr */}
@@ -145,8 +196,31 @@ export default function Map() {
                 <Pressable
                   className="flex-row justify-between py-3"
                   hitSlop={5}
+                  onPress={() => {
+                    setSelectedLayer("pressure_new");
+                    setLayerListOpen(false);
+                  }}
                 >
-                  <Text className="text-lg">Pressure</Text>
+                  {/* check icon , layer title */}
+                  <View className="flex-row items-center">
+                    {selectedLayer === "pressure_new" ? (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="mr-2"
+                      />
+                    ) : (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="opacity-0 mr-2"
+                      />
+                    )}
+                    <Text className="text-lg">Pressure</Text>
+                  </View>
+                  {/* icons */}
                   <MaterialCommunityIcons
                     name="waves"
                     size={24}
@@ -156,12 +230,35 @@ export default function Map() {
                 {/* Hr */}
                 <View className="w-full h-[0.5px] bg-gray-100" />
 
-                {/* Wind speed */}
+                {/* Wind */}
                 <Pressable
                   className="flex-row justify-between py-3"
                   hitSlop={5}
+                  onPress={() => {
+                    setSelectedLayer("wind_new");
+                    setLayerListOpen(false);
+                  }}
                 >
-                  <Text className="text-lg">Wind speed</Text>
+                  {/* check icon , layer title */}
+                  <View className="flex-row items-center">
+                    {selectedLayer === "wind_new" ? (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="mr-2"
+                      />
+                    ) : (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="opacity-0 mr-2"
+                      />
+                    )}
+                    <Text className="text-lg">Wind</Text>
+                  </View>
+                  {/* icons */}
                   <MaterialCommunityIcons
                     name="weather-windy"
                     size={24}
@@ -170,13 +267,36 @@ export default function Map() {
                 </Pressable>
                 {/* Hr */}
                 <View className="w-full h-[0.5px] bg-gray-100" />
-                
+
                 {/* Temperature */}
                 <Pressable
                   className="flex-row justify-between py-3"
                   hitSlop={5}
+                  onPress={() => {
+                    setSelectedLayer("temp_new");
+                    setLayerListOpen(false);
+                  }}
                 >
-                  <Text className="text-lg">Temperature</Text>
+                  {/* check icon , layer title */}
+                  <View className="flex-row items-center">
+                    {selectedLayer === "temp_new" ? (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="mr-2"
+                      />
+                    ) : (
+                      <Feather
+                        name="check"
+                        size={18}
+                        color="black"
+                        className="opacity-0 mr-2"
+                      />
+                    )}
+                    <Text className="text-lg">Temperature</Text>
+                  </View>
+                  {/* icons */}
                   <FontAwesome6
                     name="temperature-half"
                     size={22}

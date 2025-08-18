@@ -1,39 +1,34 @@
 {
   "base": "stations",
-  "cityID": 2611862,
-  "clouds": { "all": 40 },
+  "cityID": 6949461,
+  "clouds": { "all": 7 },
   "cod": 200,
-  "coord": { "lat": 55.6341, "lon": 12.5907 },
-  "dt": 1755200457,
-  "id": 2611862,
+  "coord": { "lat": 55.6761, "lon": 12.5683 },
+  "dt": 1755543451,
+  "id": 6949461,
   "main": {
-    "feels_like": 22.03,
-    "grnd_level": 1019,
-    "humidity": 68,
-    "pressure": 1020,
-    "sea_level": 1020,
-    "temp": 22,
-    "temp_max": 23.47,
-    "temp_min": 22
+    "feels_like": 19.5,
+    "grnd_level": 1017,
+    "humidity": 67,
+    "pressure": 1019,
+    "sea_level": 1019,
+    "temp": 19.72,
+    "temp_max": 19.94,
+    "temp_min": 19.19
   },
   "myLocation": true,
-  "name": "Tårnby",
+  "name": "Inner City",
   "sys": {
     "country": "DK",
-    "id": 1575,
-    "sunrise": 1755142811,
-    "sunset": 1755197320,
-    "type": 1
+    "id": 2035645,
+    "sunrise": 1755488873,
+    "sunset": 1755542375,
+    "type": 2
   },
   "timezone": 7200,
   "visibility": 10000,
   "weather": [
-    {
-      "description": "scattered clouds",
-      "icon": "03n",
-      "id": 802,
-      "main": "Clouds"
-    }
+    { "description": "clear sky", "icon": "01n", "id": 800, "main": "Clear" }
   ],
-  "wind": { "deg": 120, "speed": 3.6 }
+  "wind": { "deg": 210, "speed": 1.03 }
 }

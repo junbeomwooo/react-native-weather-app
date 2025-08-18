@@ -32,6 +32,58 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
+interface AsyncStorageData {
+  cityID: number;
+  cityName: string;
+  coords: {
+    latitude: number;
+    longitude: number;
+  }
+}
+
+export interface AsyncWeatherData {
+  coord: { lon: number; lat: number };
+  weather: {
+    id: number;
+    main: string;
+    description: string;
+    icon: string;
+  }[];
+  base: string;
+  main: {
+    temp: number;
+    feels_like: number;
+    temp_min: number;
+    temp_max: number;
+    pressure: number;
+    humidity: number;
+    sea_level: number;
+    grnd_level: number;
+  };
+  visibility: number;
+  wind: { speed: number; deg: number };
+  clouds: { all: number };
+  dt: number;
+  sys: {
+    type: number;
+    id: number;
+    country: string;
+    sunrise: number;
+    sunset: number;
+  };
+  timezone: number;
+  id: number;
+  name: string;
+  cod: number;
+  
+  // optional
+  cityID?: number;
+
+  // optional
+  myLocation?: boolean;
+}
+
+
 export default function List() {
   /** Global context state  */
   const { theme } = useContext(ThemeContext);
@@ -55,7 +107,7 @@ export default function List() {
   const textInputRef = useRef<TextInput>(null);
 
   /** Data for favorite cities */
-  const [cities, setCities] = useState([{}]);
+  const [cities, setCities] = useState<AsyncWeatherData[]>([]);
 
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
@@ -92,7 +144,7 @@ export default function List() {
           }
         );
 
-        const request = parsed?.map((v: any) => {
+        const request = parsed?.map((v: AsyncStorageData) => {
           if (!v?.coords) return null;
           const { latitude, longitude } = v?.coords;
           return fetch(
@@ -102,7 +154,7 @@ export default function List() {
 
         const results = await Promise.all(request);
 
-        const city = results.map((v: any, i: number) => {
+        const city = results.map((v: AsyncWeatherData, i: number) => {
           const storageData = parsed[i];
           return {
             ...v,
@@ -148,7 +200,7 @@ export default function List() {
       await AsyncStorage.removeItem(`city-${cityID}`);
       router.push("/list");
       setCities((prev) => {
-        const updateded = prev.filter((v: any) => v?.cityID !== cityID);
+        const updateded = prev.filter((v) => v?.cityID !== cityID);
         return updateded;
       });
     } catch (err) {
@@ -157,7 +209,7 @@ export default function List() {
   };
 
   // To sort the ‘myLocation’ city to the top
-  const sortedCities = [...cities].sort((a: any, b: any) => {
+  const sortedCities = [...cities].sort((a: AsyncWeatherData, b: AsyncWeatherData) => {
     if (a.myLocation) return -1;
     if (b.myLocation) return 1;
     return 0;
@@ -336,7 +388,7 @@ export default function List() {
                   </Text>
                 </Pressable>
               )}
-              keyExtractor={(item: any) => item?.id}
+              keyExtractor={(item: {id:number, name:string}) => item?.id.toString()}
             />
           ) : filterCities?.length === 0 && searchInput ? (
             // No results
@@ -377,10 +429,11 @@ export default function List() {
             {sortedCities?.length > 0 &&
             filterCities?.length === 0 &&
             !searchInput ? (
-              sortedCities?.map((v: any, i: number) => {
+              sortedCities?.map((v: AsyncWeatherData, i: number) => {           
                 const { isNight } =
                   getLocalDayTime(v);
                 const desc = v?.weather?.[0]?.description ?? "";
+                const cityID = v.cityID ? v.cityID : 0
 
                 return (
                   <View key={i} className="flex-row items-center flex-1">
@@ -390,7 +443,7 @@ export default function List() {
                         size={30}
                         color="red"
                         className="mt-6 mr-5"
-                        onPress={() => DeleteStorageItem(v?.cityID)}
+                        onPress={() => DeleteStorageItem(cityID)}
                       />
                     )}
 
