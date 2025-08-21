@@ -204,7 +204,7 @@ export default function List() {
         return updateded;
       });
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 

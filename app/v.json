@@ -1,34 +1,35 @@
-{
-  "base": "stations",
-  "cityID": 6949461,
-  "clouds": { "all": 7 },
-  "cod": 200,
-  "coord": { "lat": 55.6761, "lon": 12.5683 },
-  "dt": 1755543451,
-  "id": 6949461,
-  "main": {
-    "feels_like": 19.5,
-    "grnd_level": 1017,
-    "humidity": 67,
-    "pressure": 1019,
-    "sea_level": 1019,
-    "temp": 19.72,
-    "temp_max": 19.94,
-    "temp_min": 19.19
+[
+  {
+    "myLocation": true,
+    "cityIdFromAPI": 2611862,
+    "cityName": "Tårnby",
+    "saveDate": "2025-08-21 21:00",
+    "coords": { "latitude": 55.632964044490784, "longitude": 12.58553589002483 }
   },
-  "myLocation": true,
-  "name": "Inner City",
-  "sys": {
-    "country": "DK",
-    "id": 2035645,
-    "sunrise": 1755488873,
-    "sunset": 1755542375,
-    "type": 2
-  },
-  "timezone": 7200,
-  "visibility": 10000,
-  "weather": [
-    { "description": "clear sky", "icon": "01n", "id": 800, "main": "Clear" }
-  ],
-  "wind": { "deg": 210, "speed": 1.03 }
-}
+  {
+    "cityID": 210,
+    "cityName": "Hammamet",
+    "coords": { "latitude": 36.3961439, "longitude": 10.6141401 },
+    "currentWeather": {
+      "main": {
+        "temp": 27.08,
+        "feels_like": 28.74,
+        "temp_min": 27.08,
+        "temp_max": 27.08,
+        "pressure": 1012,
+        "humidity": 67,
+        "sea_level": 1012,
+        "grnd_level": 1006
+      },
+      "weather": [
+        {
+          "id": 800,
+          "main": "Clear",
+          "description": "clear sky",
+          "icon": "01n"
+        }
+      ],
+      "wind": { "speed": 4.17, "deg": 13, "gust": 6.02 }
+    }
+  }
+]

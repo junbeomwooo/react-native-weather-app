@@ -8,10 +8,48 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useRouter } from "expo-router";
-import { useContext, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
 import MapView, { UrlTile } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { getCurrentWeatherIcons } from "@/hooks/getWeatherIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+interface AsyncData {
+  myLocation?: boolean;
+  cityIdFromAPI?: number;
+  cityID?: number;
+  cityName: string;
+  saveDate?: string;
+  coords: {
+    latitude: number;
+    longitude: number;
+  };
+  currentWeather?: {
+    main: {
+      temp: number;
+      feels_like: number;
+      temp_min: number;
+      temp_max: number;
+      pressure: number;
+      humidity: number;
+      sea_level: number;
+      grnd_level: number;
+    };
+    weather: {
+      id: number;
+      main: string;
+      description: string;
+      icon: string;
+    }[];
+    wind: {
+      speed: number;
+      deg: number;
+      gust: number;
+    };
+  };
+}
 
 export default function Map() {
   /** API key */
@@ -24,8 +62,7 @@ export default function Map() {
   const router = useRouter();
 
   /** Context */
-  const {myLocationWeather} = useContext(LocationContext);
-  console.log(myLocationWeather);
+  const { myLocationWeather } = useContext(LocationContext);
 
   /** State value for Map layer type
    * - clouds_new
@@ -37,6 +74,8 @@ export default function Map() {
 
   const [isLayerListOpen, setLayerListOpen] = useState(false);
   const [selectedLayer, setSelectedLayer] = useState("clouds_new");
+  const [isWeatherInfoOpen, setIsWeatherInfoOpen] = useState(false);
+  const [asyncData, setAsyncData] = useState<AsyncData[] | null>(null);
 
   const { theme } = useContext(ThemeContext);
   const {
@@ -45,6 +84,26 @@ export default function Map() {
 
   const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } =
     Dimensions.get("window");
+
+  useEffect(() => {
+    const getAsnycData = async () => {
+      const keys = await AsyncStorage.getAllKeys();
+      const allDataFromStorage = await AsyncStorage.multiGet(keys);
+
+      const parsed = allDataFromStorage.map(
+        ([key, value]: [key: string, value: any]) => {
+          try {
+            return JSON.parse(value);
+          } catch {
+            return null;
+          }
+        }
+      );
+
+      setAsyncData(parsed);
+    };
+    getAsnycData();
+  }, []);
 
   /** Move to Current Location */
   const moveToCurrentLocation = () => {
@@ -60,6 +119,13 @@ export default function Map() {
       );
     }
   };
+
+  const weatherID = myLocationWeather?.weather[0]?.id
+    ? myLocationWeather?.weather[0]?.id
+    : 0;
+  const weatherName = myLocationWeather?.weather[0]?.main
+    ? myLocationWeather?.weather[0]?.main
+    : "Cannot find your location";
 
   return (
     <SafeAreaView
@@ -87,7 +153,7 @@ export default function Map() {
         <View className="flex-row justify-between absolute w-full px-4 pt-4">
           {/* Done */}
           <Pressable
-            className="w-[70px] h-[47px] bg-white justify-center items-center rounded-lg"
+            className="w-[70px] h-[47px] bg-slate-100 justify-center items-center rounded-lg"
             hitSlop={5}
             onPress={() => router.back()}
           >
@@ -98,7 +164,7 @@ export default function Map() {
             {/* location */}
             <Pressable
               hitSlop={5}
-              className="w-[47px] h-[47px] bg-white justify-center items-center rounded-lg"
+              className="w-[47px] h-[47px] bg-slate-100 justify-center items-center rounded-lg"
               onPress={moveToCurrentLocation}
             >
               <MaterialIcons
@@ -110,20 +176,23 @@ export default function Map() {
             {/* menu */}
             <Pressable
               hitSlop={5}
-              className="w-[47px] h-[47px] bg-white justify-center items-center rounded-lg mt-3"
+              className="w-[47px] h-[47px] bg-slate-100 justify-center items-center rounded-lg mt-3"
+              onPress={() => setIsWeatherInfoOpen((prev) => !prev)}
             >
               <Entypo name="menu" size={23} color="black" />
             </Pressable>
             {/* map layer list */}
             <Pressable
               hitSlop={5}
-              className="w-[47px] h-[47px] bg-white justify-center items-center rounded-lg mt-3"
+              className="w-[47px] h-[47px] bg-slate-100 justify-center items-center rounded-lg mt-3"
               onPress={() => setLayerListOpen((prev) => !prev)}
             >
               <Octicons name="stack" size={20} color="black" />
             </Pressable>
+
+            {/* Layer list (On/Off) */}
             {isLayerListOpen === true && (
-              <View className="w-[210px] h-auto bg-white mt-4 rounded-lg px-4">
+              <View className="w-[210px] h-auto bg-slate-100 mt-4 rounded-lg px-4">
                 {/* Clouds */}
                 <Pressable
                   className="flex-row justify-between py-3 items-center"
@@ -309,6 +378,46 @@ export default function Map() {
             )}
           </View>
         </View>
+
+        {/* Weather Info list (On/Off) */}
+        {isWeatherInfoOpen && (
+          <View className="w-full h-1/2 bg-slate-100 absolute bottom-0 pt-5">
+            {/* Header */}
+            <View className="flex-row justify-between items-center px-7">
+              {/* Icons and Title */}
+              <View className="flex-row items-center">
+                {/* Icons */}
+                <View className="mr-[12px]">
+                  {getCurrentWeatherIcons(weatherID, 48, "light")}
+                </View>
+                {/* Weather desc */}
+                <View>
+                  <Text className="font-semibold text-lg">{weatherName}</Text>
+                  <Text className="text-sm font-medium text-gray-400">
+                    Your Locations
+                  </Text>
+                </View>
+              </View>
+
+              {/* Cancle Icon */}
+              <Pressable
+                hitSlop={5}
+                onPress={() => setIsWeatherInfoOpen(false)}
+              >
+                <MaterialIcons name="cancel" size={26} color="black" />
+              </Pressable>
+            </View>
+
+            {/* <View className="w-full bg-gray-200 h-[1px] mt-5"/> */}
+
+            <View className="bg-white mx-7 mt-4 rounded-xl">
+              {asyncData?.map((v, i) => {
+                console.log(v);
+                return <View key={i}></View>;
+              })}
+            </View>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );

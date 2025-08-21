@@ -28,7 +28,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { CurrnetWeatherData, DailyHourlyWeatherData } from "..";
 
-
 export default function City() {
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -37,7 +36,8 @@ export default function City() {
 
   const [location, setLocation] = useState<string | null>(null);
 
-  const [currentWeather, setCurrentWeather] = useState<CurrnetWeatherData | null>(null);
+  const [currentWeather, setCurrentWeather] =
+    useState<CurrnetWeatherData | null>(null);
   const [hourlyWeather, setHourlyWeather] = useState([]);
   const [dailyWeather, setDailyWeather] = useState([]);
   const [lanlng, setLanLng] = useState({});
@@ -48,7 +48,9 @@ export default function City() {
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
   const { cityID } = useGlobalSearchParams();
-  const cityObj = major_cities?.find((v: {id:number, name:string}) => v.id === Number(cityID));
+  const cityObj = major_cities?.find(
+    (v: { id: number; name: string }) => v.id === Number(cityID)
+  );
   const cityName = cityObj?.name;
   const cityNumber = cityObj?.id;
   const seacrhedCity = Array.isArray(cityName) ? cityName[0] : cityName;
@@ -123,6 +125,11 @@ export default function City() {
       cityID: cityNumber,
       cityName: cityName,
       coords: lanlng,
+      currentWeather: {
+        main: currentWeather?.main,
+        weather: currentWeather?.weather,
+        wind: currentWeather?.wind,
+      },
     };
 
     try {
@@ -173,7 +180,7 @@ export default function City() {
   );
 
   const { sunrise, sunset, isNight } = getLocalDayTime(currentWeather);
-  const title = location ? location : ""
+  const title = location ? location : "";
 
   return (
     <Fragment>
