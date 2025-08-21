@@ -13,7 +13,6 @@ import { Dimensions, Pressable, Text, View } from "react-native";
 import MapView, { UrlTile } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { getCurrentWeatherIcons } from "@/hooks/getWeatherIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface AsyncData {
@@ -120,12 +119,57 @@ export default function Map() {
     }
   };
 
-  const weatherID = myLocationWeather?.weather[0]?.id
-    ? myLocationWeather?.weather[0]?.id
-    : 0;
-  const weatherName = myLocationWeather?.weather[0]?.main
-    ? myLocationWeather?.weather[0]?.main
-    : "Cannot find your location";
+  /** Weather Icon */
+
+  let weatherIcon;
+  switch (selectedLayer) {
+    case "clouds_new":
+      weatherIcon = <Ionicons name="cloud-outline" size={46} color="black" />;
+      break;
+    case "precipitation_new":
+      weatherIcon = (
+        <Ionicons name="umbrella-outline" size={44} color="black" />
+      );
+      break;
+    case "pressure_new":
+      weatherIcon = (
+        <MaterialCommunityIcons name="waves" size={44} color="black" />
+      );
+      break;
+    case "wind_new":
+      weatherIcon = (
+        <MaterialCommunityIcons name="weather-windy" size={42} color="black" />
+      );
+      break;
+    case "temp_new":
+      weatherIcon = (
+        <FontAwesome6 name="temperature-half" size={40} color="black" />
+      );
+      break;
+    default:
+      weatherIcon = null;
+  }
+
+  let layerOption;
+  switch (selectedLayer) {
+    case "clouds_new":
+      layerOption = "Clouds";
+      break;
+    case "precipitation_new":
+      layerOption = "Precipitation";
+      break;
+    case "pressure_new":
+      layerOption = "Pressure";
+      break;
+    case "wind_new":
+      layerOption = "Wind";
+      break;
+    case "temp_new":
+      layerOption = "Temperature";
+      break;
+    default:
+      layerOption = null;
+  }
 
   return (
     <SafeAreaView
@@ -387,12 +431,10 @@ export default function Map() {
               {/* Icons and Title */}
               <View className="flex-row items-center">
                 {/* Icons */}
-                <View className="mr-[12px]">
-                  {getCurrentWeatherIcons(weatherID, 48, "light")}
-                </View>
+                <View className="mr-[12px]">{weatherIcon}</View>
                 {/* Weather desc */}
                 <View>
-                  <Text className="font-semibold text-lg">{weatherName}</Text>
+                  <Text className="font-semibold text-lg">{layerOption}</Text>
                   <Text className="text-sm font-medium text-gray-400">
                     Your Locations
                   </Text>
@@ -404,7 +446,7 @@ export default function Map() {
                 hitSlop={5}
                 onPress={() => setIsWeatherInfoOpen(false)}
               >
-                <MaterialIcons name="cancel" size={26} color="black" />
+                <MaterialIcons name="cancel" size={30} color="black" />
               </Pressable>
             </View>
 
@@ -413,7 +455,34 @@ export default function Map() {
             <View className="bg-white mx-7 mt-4 rounded-xl">
               {asyncData?.map((v, i) => {
                 console.log(v);
-                return <View key={i}></View>;
+                const clouds = null;
+                const precipitation = null;
+                const pressure = null;
+                const wind = null;
+                const temeperature = null;
+
+                return (
+                  <View key={i} className="px-6 justify-center mt-3">
+                    {/* left */}
+                    <View>
+                      {/* Location name */}
+                      <Text className="text-lg">
+                        {v?.myLocation === true ? "My Location" : v?.cityName}
+                        {}
+                      </Text>
+                    </View>
+
+                    {/* right */}
+                    <View></View>
+
+                    {/* hr */}
+                    {i + 1 < asyncData.length ? (
+                      <View className="w-full h-[1px] bg-slate-200 mt-3" />
+                    ) : (
+                      <View className="mt-3" />
+                    )}
+                  </View>
+                );
               })}
             </View>
           </View>
