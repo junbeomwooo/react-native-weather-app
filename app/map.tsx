@@ -8,11 +8,12 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useRouter } from "expo-router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { JSX, useContext, useEffect, useRef, useState } from "react";
 import { Dimensions, Pressable, Text, View } from "react-native";
 import MapView, { UrlTile } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { getWeatherIconsforMaps } from "@/hooks/getWeatherIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface AsyncData {
@@ -104,6 +105,30 @@ export default function Map() {
     getAsnycData();
   }, []);
 
+  const getWindDirection = (deg: number): string => {
+    if (deg >= 337.5 || deg < 22.5) return "N";
+    if (deg >= 22.5 && deg < 67.5) return "NE";
+    if (deg >= 67.5 && deg < 112.5) return "E";
+    if (deg >= 112.5 && deg < 157.5) return "SE";
+    if (deg >= 157.5 && deg < 202.5) return "S";
+    if (deg >= 202.5 && deg < 247.5) return "SW";
+    if (deg >= 247.5 && deg < 292.5) return "W";
+    if (deg >= 292.5 && deg < 337.5) return "NW";
+    return "";
+  };
+
+  const getWindIconsDeg = (deg: string): number => {
+    if (deg === "N") return 0;
+    if (deg === "NE") return 45;
+    if (deg === "E") return 90;
+    if (deg === "SE") return 135;
+    if (deg === "S") return 180;
+    if (deg === "SW") return 225;
+    if (deg === "W") return 270;
+    if (deg === "NW") return 315;
+    return 360;
+  };
+
   /** Move to Current Location */
   const moveToCurrentLocation = () => {
     if (mapRef.current) {
@@ -170,6 +195,9 @@ export default function Map() {
     default:
       layerOption = null;
   }
+
+  // AsyncData excluded MyLocation
+  const filteredAsyncData = asyncData?.filter((v) => !v.myLocation);
 
   return (
     <SafeAreaView
@@ -435,7 +463,7 @@ export default function Map() {
                 {/* Weather desc */}
                 <View>
                   <Text className="font-semibold text-lg">{layerOption}</Text>
-                  <Text className="text-sm font-medium text-gray-400">
+                  <Text className="text-sm font-normal text-gray-500">
                     Your Locations
                   </Text>
                 </View>
@@ -450,34 +478,106 @@ export default function Map() {
               </Pressable>
             </View>
 
-            {/* <View className="w-full bg-gray-200 h-[1px] mt-5"/> */}
-
+            {/* Async data */}
             <View className="bg-white mx-7 mt-4 rounded-xl">
-              {asyncData?.map((v, i) => {
-                console.log(v);
-                const clouds = null;
-                const precipitation = null;
-                const pressure = null;
-                const wind = null;
-                const temeperature = null;
+              {filteredAsyncData?.map((v, i) => {
+                /** Weather Icons */
+                const weatherIcons = v?.currentWeather?.weather[0]?.id ?? 0;
 
-                return (
-                  <View key={i} className="px-6 justify-center mt-3">
-                    {/* left */}
-                    <View>
-                      {/* Location name */}
-                      <Text className="text-lg">
-                        {v?.myLocation === true ? "My Location" : v?.cityName}
-                        {}
+                /** Wind direction */
+                // Wind deg number value
+                const windDegNumber = v?.currentWeather?.wind?.deg
+                  ? v?.currentWeather?.wind?.deg
+                  : 0;
+
+                // Wind deg string value
+                const windDegString = getWindDirection(windDegNumber);
+
+                // Wind deg number value divided into 8 directions
+                const weatherDegNumberForIcons = getWindIconsDeg(windDegString);
+
+                /** Desc */
+                // Description for left
+                const leftDescMap: Record<string, JSX.Element | null> = {
+                  clouds_new: null,
+                  precipitation_new: null,
+                  pressure_new: (
+                    <Text className="text-gray-500 font-normal text-sm">
+                      {`Sea: ${v?.currentWeather?.main?.sea_level}, Ground: ${v?.currentWeather?.main?.grnd_level}`}
+                    </Text>
+                  ),
+                  wind_new: (
+                    <Text className="text-gray-500 font-normal text-sm">
+                      {`Wind: ${v?.currentWeather?.wind?.speed} m/s`}
+                    </Text>
+                  ),
+                  temp_new: (
+                    <Text className="text-gray-500 font-normal text-sm">
+                      {`H: ${v?.currentWeather?.main?.temp_max.toFixed(
+                        0
+                      )}°, L: ${v?.currentWeather?.main?.temp_min.toFixed(0)}°`}
+                    </Text>
+                  ),
+                };
+
+                // Description for right
+                const rightDescMap: Record<string, JSX.Element | undefined> = {
+                  clouds_new: getWeatherIconsforMaps(weatherIcons, 30, theme),
+                  precipitation_new: getWeatherIconsforMaps(
+                    weatherIcons,
+                    30,
+                    theme
+                  ),
+                  pressure_new: (
+                    <Text className="text-gray-500 font-normal text-lg">
+                      {v?.currentWeather?.main?.pressure}
+                    </Text>
+                  ),
+                  wind_new: (
+                    <View className="flex-row items-center">
+                      <Ionicons
+                        name="arrow-up-outline"
+                        size={20}
+                        color="light"
+                        className="opacity-50"
+                        style={{
+                          transform: [
+                            { rotate: `${weatherDegNumberForIcons + 180}deg` },
+                          ],
+                        }}
+                      />
+                      <Text className="ml-4 text-lg font-normal text-gray-500">
+                        {windDegString}
                       </Text>
                     </View>
+                  ),
+                  temp_new: (
+                    <Text className="text-gray-500 font-normal text-lg">
+                      {v?.currentWeather?.main?.temp.toFixed(0)}°
+                    </Text>
+                  ),
+                };
 
-                    {/* right */}
-                    <View></View>
+                const leftDesc = leftDescMap[selectedLayer] ?? null;
+                const rightDesc = rightDescMap[selectedLayer] ?? null;
+
+                return (
+                  <View key={i} className="px-6 justify-center mt-4">
+                    <View className="flex-row justify-between items-center">
+                      {/* left */}
+                      <View>
+                        {/* Location name */}
+                        <Text className="text-lg">{v?.cityName}</Text>
+                        {leftDesc}
+                      </View>
+
+                      {/* right */}
+                      <View>{rightDesc}</View>
+                    </View>
 
                     {/* hr */}
-                    {i + 1 < asyncData.length ? (
-                      <View className="w-full h-[1px] bg-slate-200 mt-3" />
+                    {i + 1 < filteredAsyncData.length ? (
+                      <View className="w-full h-[1px] bg-slate-200 mt-4" />
                     ) : (
                       <View className="mt-3" />
                     )}

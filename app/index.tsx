@@ -584,7 +584,7 @@ export default function Index() {
                   color={theme === "light" ? "black" : "white"}
                   style={{
                     transform: [
-                      { rotate: `${currentWeather?.wind?.deg + 180}deg` },
+                      { rotate: `${currentWeather?.wind?.deg + 135}deg` },
                     ],
                   }}
                 />

@@ -1,35 +1,26 @@
-[
-  {
-    "myLocation": true,
-    "cityIdFromAPI": 2611862,
-    "cityName": "Tårnby",
-    "saveDate": "2025-08-21 21:00",
-    "coords": { "latitude": 55.632964044490784, "longitude": 12.58553589002483 }
-  },
-  {
-    "cityID": 210,
-    "cityName": "Hammamet",
-    "coords": { "latitude": 36.3961439, "longitude": 10.6141401 },
-    "currentWeather": {
-      "main": {
-        "temp": 27.08,
-        "feels_like": 28.74,
-        "temp_min": 27.08,
-        "temp_max": 27.08,
-        "pressure": 1012,
-        "humidity": 67,
-        "sea_level": 1012,
-        "grnd_level": 1006
-      },
-      "weather": [
-        {
-          "id": 800,
-          "main": "Clear",
-          "description": "clear sky",
-          "icon": "01n"
-        }
-      ],
-      "wind": { "speed": 4.17, "deg": 13, "gust": 6.02 }
-    }
+{
+  "cityID": 1,
+  "cityName": "Aabolg",
+  "coords": { "latitude": 57.0466647, "longitude": 9.9195393 },
+  "currentWeather": {
+    "main": {
+      "temp": 14.96,
+      "feels_like": 14.26,
+      "temp_min": 14.96,
+      "temp_max": 15.54,
+      "pressure": 1009,
+      "humidity": 67,
+      "sea_level": 1009,
+      "grnd_level": 1006
+    },
+    "weather": [
+      {
+        "id": 803,
+        "main": "Clouds",
+        "description": "broken clouds",
+        "icon": "04d"
+      }
+    ],
+    "wind": { "speed": 3.6, "deg": 280 }
   }
-]
+}
