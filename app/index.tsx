@@ -93,7 +93,7 @@ interface CoordsData {
 
 export default function Index() {
   const { theme, setSunrise, setSunset } = useContext(ThemeContext);
-  const { setLatLng, setMyLocationWeather } = useContext(LocationContext);
+  const { setLatLng } = useContext(LocationContext);
 
   const WINDOW_WIDTH = Dimensions.get("window").width;
   const WINDOW_HEIGHT = Dimensions.get("window").height;
@@ -119,7 +119,8 @@ export default function Index() {
   const saveIntoAsyncStorage = async (
     cityID: number,
     cityName: string,
-    coords: CoordsData
+    coords: CoordsData,
+    currentWeather:CurrnetWeatherData
   ) => {
     /** 
         *  Find local time based on user's device time
@@ -141,6 +142,7 @@ export default function Index() {
       cityName: cityName,
       saveDate: todayString,
       coords: coords,
+      currentWeather:currentWeather
     };
     try {
       const existing = await AsyncStorage.getItem("myLocation");
@@ -208,12 +210,11 @@ export default function Index() {
         const city = currentWeatherJSON?.name ? currentWeatherJSON?.name : "";
 
         setLocation(city);
-        setMyLocationWeather(currentWeatherJSON);
 
         saveIntoAsyncStorage(currentWeatherJSON.id, currentWeatherJSON.name, {
           latitude: latitude,
           longitude: longitude,
-        });
+        },currentWeatherJSON);
 
         // set Sunrise, Sunset time for React Context
 
@@ -241,7 +242,7 @@ export default function Index() {
       }
     }
     getCurrentLocation();
-  }, [WEATHER_API_KEY, setSunrise, setSunset, setLatLng, setMyLocationWeather]);
+  }, [WEATHER_API_KEY, setSunrise, setSunset, setLatLng]);
 
   const navigation = useNavigation();
 

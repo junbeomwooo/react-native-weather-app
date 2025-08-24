@@ -9,9 +9,16 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import Octicons from "@expo/vector-icons/Octicons";
 import { useRouter } from "expo-router";
 import { JSX, useContext, useEffect, useRef, useState } from "react";
-import { Dimensions, Pressable, Text, View } from "react-native";
+import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
 import MapView, { UrlTile } from "react-native-maps";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from "react-native-reanimated";
 
 import { getWeatherIconsforMaps } from "@/hooks/getWeatherIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -61,9 +68,6 @@ export default function Map() {
   /** router */
   const router = useRouter();
 
-  /** Context */
-  const { myLocationWeather } = useContext(LocationContext);
-
   /** State value for Map layer type
    * - clouds_new
    * - precipitation_new
@@ -105,31 +109,18 @@ export default function Map() {
     getAsnycData();
   }, []);
 
-  const getWindDirection = (deg: number): string => {
-    if (deg >= 337.5 || deg < 22.5) return "N";
-    if (deg >= 22.5 && deg < 67.5) return "NE";
-    if (deg >= 67.5 && deg < 112.5) return "E";
-    if (deg >= 112.5 && deg < 157.5) return "SE";
-    if (deg >= 157.5 && deg < 202.5) return "S";
-    if (deg >= 202.5 && deg < 247.5) return "SW";
-    if (deg >= 247.5 && deg < 292.5) return "W";
-    if (deg >= 292.5 && deg < 337.5) return "NW";
-    return "";
-  };
+  // To sort the ‘myLocation’ city to the top
+  const sortedCities = [...(asyncData ?? [])].sort(
+    (a: AsyncData, b: AsyncData) => {
+      if (a.myLocation) return -1;
+      if (b.myLocation) return 1;
+      return 0;
+    }
+  );
 
-  const getWindIconsDeg = (deg: string): number => {
-    if (deg === "N") return 0;
-    if (deg === "NE") return 45;
-    if (deg === "E") return 90;
-    if (deg === "SE") return 135;
-    if (deg === "S") return 180;
-    if (deg === "SW") return 225;
-    if (deg === "W") return 270;
-    if (deg === "NW") return 315;
-    return 360;
-  };
+  /** Move to location */
 
-  /** Move to Current Location */
+  // Move to Current Location
   const moveToCurrentLocation = () => {
     if (mapRef.current) {
       mapRef.current.animateToRegion(
@@ -141,6 +132,22 @@ export default function Map() {
         },
         1000
       );
+    }
+  };
+
+  // Move to selected location
+  const moveToSelectedLocation = (latitude: number, longitude: number) => {
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(
+        {
+          latitude: latitude,
+          longitude: longitude,
+          latitudeDelta: 6.5,
+          longitudeDelta: 6.5,
+        },
+        1000
+      );
+      setIsWeatherInfoOpen(false);
     }
   };
 
@@ -196,13 +203,138 @@ export default function Map() {
       layerOption = null;
   }
 
-  // AsyncData excluded MyLocation
-  const filteredAsyncData = asyncData?.filter((v) => !v.myLocation);
+  /** Wind Icons */
+
+  // Get wind directions
+  const getWindDirection = (deg: number): string => {
+    if (deg >= 337.5 || deg < 22.5) return "N";
+    if (deg >= 22.5 && deg < 67.5) return "NE";
+    if (deg >= 67.5 && deg < 112.5) return "E";
+    if (deg >= 112.5 && deg < 157.5) return "SE";
+    if (deg >= 157.5 && deg < 202.5) return "S";
+    if (deg >= 202.5 && deg < 247.5) return "SW";
+    if (deg >= 247.5 && deg < 292.5) return "W";
+    if (deg >= 292.5 && deg < 337.5) return "NW";
+    return "";
+  };
+
+  // Get wind deg icons based on wind directions
+  const getWindIconsDeg = (deg: string): number => {
+    if (deg === "N") return 0;
+    if (deg === "NE") return 45;
+    if (deg === "E") return 90;
+    if (deg === "SE") return 135;
+    if (deg === "S") return 180;
+    if (deg === "SW") return 225;
+    if (deg === "W") return 270;
+    if (deg === "NW") return 315;
+    return 360;
+  };
+
+  // Animation Popup for Saved cities
+
+  const weatherInfoHeight = useSharedValue(0);
+  const weatherInfoOpacity = useSharedValue(0);
+
+  useEffect(() => {
+    if (isWeatherInfoOpen) {
+      weatherInfoHeight.value = withTiming(WINDOW_HEIGHT / 2, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+
+      weatherInfoOpacity.value = withTiming(1, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+    } else {
+      weatherInfoHeight.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+
+      weatherInfoOpacity.value = withTiming(0, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      });
+    }
+  }, [weatherInfoHeight, isWeatherInfoOpen, WINDOW_HEIGHT, weatherInfoOpacity]);
+
+  const animatedWeatherInfoStyle = useAnimatedStyle(() => ({
+    height: weatherInfoHeight.value,
+    opacity: weatherInfoOpacity.value,
+  }));
+
+  // Animation for layer list
+
+  const layerListHeight = useSharedValue(0);
+  const layerListWidth = useSharedValue(0);
+  const layerListOpacity = useSharedValue(0);
+
+  useEffect(() => {
+    if (isLayerListOpen) {
+      layerListHeight.value = withTiming(233, {
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+      });
+
+      layerListWidth.value = withTiming(220, {
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+      });
+
+      layerListOpacity.value = withTiming(1, {
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+      });
+    } else {
+      layerListHeight.value = withTiming(0, {
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+      });
+
+      layerListWidth.value = withTiming(0, {
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+      });
+
+      layerListOpacity.value = withTiming(0, {
+        duration: 250,
+        easing: Easing.out(Easing.ease),
+      });
+    }
+  }, [layerListHeight, isLayerListOpen, WINDOW_HEIGHT, layerListOpacity, layerListWidth]);
+
+  const animatedlayerListAnimation = useAnimatedStyle(() => ({
+    height: layerListHeight.value,
+    width: layerListWidth.value,
+    opacity: layerListOpacity.value,
+  }));
 
   return (
     <SafeAreaView
       className={`${theme === "light" ? "bg-white" : "bg-black"} flex-1`}
     >
+      {/* Overlay */}
+      {(isLayerListOpen || isWeatherInfoOpen) && (
+        <Pressable
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: WINDOW_WIDTH,
+            height: WINDOW_HEIGHT,
+            backgroundColor: "rgba(0, 0, 0, 0.25)",
+            zIndex: 10,
+          }}
+          onPress={() => {
+            setLayerListOpen(false);
+            setIsWeatherInfoOpen(false);
+          }}
+        />
+      )}
+
+      {/* All contents */}
       <View style={{ width: WINDOW_WIDTH, height: WINDOW_HEIGHT }}>
         {/* Map */}
         <MapView
@@ -263,8 +395,11 @@ export default function Map() {
             </Pressable>
 
             {/* Layer list (On/Off) */}
-            {isLayerListOpen === true && (
-              <View className="w-[210px] h-auto bg-slate-100 mt-4 rounded-lg px-4">
+            {
+              <Animated.View
+                className="bg-slate-100 mt-4 rounded-lg px-5 z-20 overflow-hidden"
+                style={animatedlayerListAnimation}
+              >
                 {/* Clouds */}
                 <Pressable
                   className="flex-row justify-between py-3 items-center"
@@ -446,16 +581,19 @@ export default function Map() {
                 </Pressable>
                 {/* Hr */}
                 <View className="w-full h-[0.5px] bg-gray-100" />
-              </View>
-            )}
+              </Animated.View>
+            }
           </View>
         </View>
 
         {/* Weather Info list (On/Off) */}
-        {isWeatherInfoOpen && (
-          <View className="w-full h-1/2 bg-slate-100 absolute bottom-0 pt-5">
+        {
+          <Animated.View
+            className="w-full bg-slate-100 absolute bottom-0 pt-5 z-20"
+            style={animatedWeatherInfoStyle}
+          >
             {/* Header */}
-            <View className="flex-row justify-between items-center px-7">
+            <View className="flex-row justify-between items-center px-7 pb-4">
               {/* Icons and Title */}
               <View className="flex-row items-center">
                 {/* Icons */}
@@ -479,114 +617,138 @@ export default function Map() {
             </View>
 
             {/* Async data */}
-            <View className="bg-white mx-7 mt-4 rounded-xl">
-              {filteredAsyncData?.map((v, i) => {
-                /** Weather Icons */
-                const weatherIcons = v?.currentWeather?.weather[0]?.id ?? 0;
+            <ScrollView>
+              <View className="mx-7 mt-4 rounded-2xl bg-white mb-[120px]">
+                {sortedCities?.map((v, i) => {
+                  /** Weather Icons */
+                  const weatherIcons = v?.currentWeather?.weather[0]?.id ?? 0;
 
-                /** Wind direction */
-                // Wind deg number value
-                const windDegNumber = v?.currentWeather?.wind?.deg
-                  ? v?.currentWeather?.wind?.deg
-                  : 0;
+                  /** Wind direction */
+                  // Wind deg number value
+                  const windDegNumber = v?.currentWeather?.wind?.deg
+                    ? v?.currentWeather?.wind?.deg
+                    : 0;
 
-                // Wind deg string value
-                const windDegString = getWindDirection(windDegNumber);
+                  // Wind deg string value
+                  const windDegString = getWindDirection(windDegNumber);
 
-                // Wind deg number value divided into 8 directions
-                const weatherDegNumberForIcons = getWindIconsDeg(windDegString);
+                  // Wind deg number value divided into 8 directions
+                  const weatherDegNumberForIcons =
+                    getWindIconsDeg(windDegString);
 
-                /** Desc */
-                // Description for left
-                const leftDescMap: Record<string, JSX.Element | null> = {
-                  clouds_new: null,
-                  precipitation_new: null,
-                  pressure_new: (
-                    <Text className="text-gray-500 font-normal text-sm">
-                      {`Sea: ${v?.currentWeather?.main?.sea_level}, Ground: ${v?.currentWeather?.main?.grnd_level}`}
-                    </Text>
-                  ),
-                  wind_new: (
-                    <Text className="text-gray-500 font-normal text-sm">
-                      {`Wind: ${v?.currentWeather?.wind?.speed} m/s`}
-                    </Text>
-                  ),
-                  temp_new: (
-                    <Text className="text-gray-500 font-normal text-sm">
-                      {`H: ${v?.currentWeather?.main?.temp_max.toFixed(
-                        0
-                      )}°, L: ${v?.currentWeather?.main?.temp_min.toFixed(0)}°`}
-                    </Text>
-                  ),
-                };
-
-                // Description for right
-                const rightDescMap: Record<string, JSX.Element | undefined> = {
-                  clouds_new: getWeatherIconsforMaps(weatherIcons, 30, theme),
-                  precipitation_new: getWeatherIconsforMaps(
-                    weatherIcons,
-                    30,
-                    theme
-                  ),
-                  pressure_new: (
-                    <Text className="text-gray-500 font-normal text-lg">
-                      {v?.currentWeather?.main?.pressure}
-                    </Text>
-                  ),
-                  wind_new: (
-                    <View className="flex-row items-center">
-                      <Ionicons
-                        name="arrow-up-outline"
-                        size={20}
-                        color="light"
-                        className="opacity-50"
-                        style={{
-                          transform: [
-                            { rotate: `${weatherDegNumberForIcons + 180}deg` },
-                          ],
-                        }}
-                      />
-                      <Text className="ml-4 text-lg font-normal text-gray-500">
-                        {windDegString}
+                  /** Desc */
+                  // Description for left
+                  const leftDescMap: Record<string, JSX.Element | null> = {
+                    clouds_new: null,
+                    precipitation_new: null,
+                    pressure_new: (
+                      <Text className="text-gray-500 font-normal text-sm">
+                        {`Sea: ${v?.currentWeather?.main?.sea_level}, Ground: ${v?.currentWeather?.main?.grnd_level}`}
                       </Text>
-                    </View>
-                  ),
-                  temp_new: (
-                    <Text className="text-gray-500 font-normal text-lg">
-                      {v?.currentWeather?.main?.temp.toFixed(0)}°
-                    </Text>
-                  ),
-                };
+                    ),
+                    wind_new: (
+                      <Text className="text-gray-500 font-normal text-sm">
+                        {`Wind: ${v?.currentWeather?.wind?.speed} m/s`}
+                      </Text>
+                    ),
+                    temp_new: (
+                      <Text className="text-gray-500 font-normal text-sm">
+                        {`H: ${v?.currentWeather?.main?.temp_max.toFixed(
+                          0
+                        )}°, L: ${v?.currentWeather?.main?.temp_min.toFixed(
+                          0
+                        )}°`}
+                      </Text>
+                    ),
+                  };
 
-                const leftDesc = leftDescMap[selectedLayer] ?? null;
-                const rightDesc = rightDescMap[selectedLayer] ?? null;
+                  // Description for right
+                  const rightDescMap: Record<string, JSX.Element | undefined> =
+                    {
+                      clouds_new: getWeatherIconsforMaps(
+                        weatherIcons,
+                        30,
+                        theme
+                      ),
+                      precipitation_new: getWeatherIconsforMaps(
+                        weatherIcons,
+                        30,
+                        theme
+                      ),
+                      pressure_new: (
+                        <Text className="text-gray-500 font-normal text-lg">
+                          {v?.currentWeather?.main?.pressure}
+                        </Text>
+                      ),
+                      wind_new: (
+                        <View className="flex-row items-center">
+                          <Ionicons
+                            name="arrow-up-outline"
+                            size={20}
+                            color="light"
+                            className="opacity-50"
+                            style={{
+                              transform: [
+                                {
+                                  rotate: `${
+                                    weatherDegNumberForIcons + 180
+                                  }deg`,
+                                },
+                              ],
+                            }}
+                          />
+                          <Text className="ml-4 text-lg font-normal text-gray-500">
+                            {windDegString}
+                          </Text>
+                        </View>
+                      ),
+                      temp_new: (
+                        <Text className="text-gray-500 font-normal text-lg">
+                          {v?.currentWeather?.main?.temp.toFixed(0)}°
+                        </Text>
+                      ),
+                    };
 
-                return (
-                  <View key={i} className="px-6 justify-center mt-4">
-                    <View className="flex-row justify-between items-center">
-                      {/* left */}
-                      <View>
-                        {/* Location name */}
-                        <Text className="text-lg">{v?.cityName}</Text>
-                        {leftDesc}
+                  const leftDesc = leftDescMap[selectedLayer] ?? null;
+                  const rightDesc = rightDescMap[selectedLayer] ?? null;
+
+                  return (
+                    <Pressable
+                      key={i}
+                      className="px-6 justify-center mt-4"
+                      hitSlop={5}
+                      onPress={() =>
+                        moveToSelectedLocation(
+                          v?.coords?.latitude,
+                          v?.coords?.longitude
+                        )
+                      }
+                    >
+                      <View className="flex-row justify-between items-center">
+                        {/* left */}
+                        <View>
+                          {/* Location name */}
+                          <Text className="text-lg">{v?.cityName}</Text>
+                          {leftDesc}
+                        </View>
+
+                        {/* right */}
+                        <View>{rightDesc}</View>
                       </View>
 
-                      {/* right */}
-                      <View>{rightDesc}</View>
-                    </View>
-
-                    {/* hr */}
-                    {i + 1 < filteredAsyncData.length ? (
-                      <View className="w-full h-[1px] bg-slate-200 mt-4" />
-                    ) : (
-                      <View className="mt-3" />
-                    )}
-                  </View>
-                );
-              })}
-            </View>
-          </View>
-        )}
+                      {/* hr */}
+                      {i + 1 < sortedCities.length ? (
+                        <View className="w-full h-[1px] bg-slate-200 mt-4" />
+                      ) : (
+                        <View className="mt-3" />
+                      )}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </ScrollView>
+          </Animated.View>
+        }
       </View>
     </SafeAreaView>
   );

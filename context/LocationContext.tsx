@@ -39,24 +39,19 @@ export interface WeatherData {
 export type LocationType = {
   latlng: [number, number];
   setLatLng: React.Dispatch<React.SetStateAction<[number, number]>>;
-  myLocationWeather: WeatherData | null,
-  setMyLocationWeather: React.Dispatch<React.SetStateAction<WeatherData | null>>;
 };
 
 
 export const LocationContext = createContext<LocationType>({
   latlng: [0, 0],
   setLatLng: () => {},
-  myLocationWeather:null,
-  setMyLocationWeather: () => {}
 });
 
 export function LocationProvider({children}:{ children: ReactNode }) {
   const [latlng, setLatLng] = useState<[number, number]>([0, 0]);
-  const [myLocationWeather, setMyLocationWeather] = useState<WeatherData | null>(null);
 
   return (
-  <LocationContext.Provider value={{latlng, setLatLng, myLocationWeather, setMyLocationWeather}}>
+  <LocationContext.Provider value={{latlng, setLatLng}}>
     {children}
   </LocationContext.Provider>
   );

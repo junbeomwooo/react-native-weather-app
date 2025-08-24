@@ -1,26 +1,61 @@
-{
-  "cityID": 1,
-  "cityName": "Aabolg",
-  "coords": { "latitude": 57.0466647, "longitude": 9.9195393 },
-  "currentWeather": {
-    "main": {
-      "temp": 14.96,
-      "feels_like": 14.26,
-      "temp_min": 14.96,
-      "temp_max": 15.54,
-      "pressure": 1009,
-      "humidity": 67,
-      "sea_level": 1009,
-      "grnd_level": 1006
-    },
-    "weather": [
-      {
-        "id": 803,
-        "main": "Clouds",
-        "description": "broken clouds",
-        "icon": "04d"
-      }
-    ],
-    "wind": { "speed": 3.6, "deg": 280 }
+[
+  {
+    "myLocation": true,
+    "cityIdFromAPI": 6949461,
+    "cityName": "Inner City",
+    "saveDate": "2025-08-24 20:00",
+    "coords": { "latitude": 55.6761, "longitude": 12.5683 }
+  },
+  {
+    "cityID": 210,
+    "cityName": "Hammamet",
+    "coords": { "latitude": 36.3961439, "longitude": 10.6141401 },
+    "currentWeather": {
+      "main": {
+        "temp": 26.85,
+        "feels_like": 28.24,
+        "temp_min": 26.85,
+        "temp_max": 26.85,
+        "pressure": 1014,
+        "humidity": 65,
+        "sea_level": 1014,
+        "grnd_level": 1007
+      },
+      "weather": [
+        {
+          "id": 802,
+          "main": "Clouds",
+          "description": "scattered clouds",
+          "icon": "03n"
+        }
+      ],
+      "wind": { "speed": 7.6, "deg": 1, "gust": 9.85 }
+    }
+  },
+  {
+    "cityID": 1,
+    "cityName": "Aabolg",
+    "coords": { "latitude": 57.0466647, "longitude": 9.9195393 },
+    "currentWeather": {
+      "main": {
+        "temp": 14.96,
+        "feels_like": 14.26,
+        "temp_min": 14.96,
+        "temp_max": 15.54,
+        "pressure": 1009,
+        "humidity": 67,
+        "sea_level": 1009,
+        "grnd_level": 1006
+      },
+      "weather": [
+        {
+          "id": 803,
+          "main": "Clouds",
+          "description": "broken clouds",
+          "icon": "04d"
+        }
+      ],
+      "wind": { "speed": 3.6, "deg": 280 }
+    }
   }
-}
+]
