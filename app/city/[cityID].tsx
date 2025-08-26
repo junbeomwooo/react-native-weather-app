@@ -147,7 +147,7 @@ export default function City() {
 
       await AsyncStorage.setItem(`city-${cityID}`, JSON.stringify(address));
 
-      router.push("/list");
+      router.back();
     } catch (err) {
       console.error(err);
     }
@@ -157,7 +157,7 @@ export default function City() {
   const DeleteStorageItem = async () => {
     try {
       await AsyncStorage.removeItem(`city-${cityID}`);
-      router.push("/list");
+      router.back();
     } catch (err) {
       console.error(err);
     }

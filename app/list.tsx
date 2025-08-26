@@ -13,7 +13,7 @@ import {
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { usePathname, useRouter } from "expo-router";
 
 import major_cities from "@/assets/major_cities_200.json";
 import { LinearGradient } from "expo-linear-gradient";
@@ -38,7 +38,7 @@ interface AsyncStorageData {
   coords: {
     latitude: number;
     longitude: number;
-  }
+  };
 }
 
 export interface AsyncWeatherData {
@@ -75,14 +75,13 @@ export interface AsyncWeatherData {
   id: number;
   name: string;
   cod: number;
-  
+
   // optional
   cityID?: number;
 
   // optional
   myLocation?: boolean;
 }
-
 
 export default function List() {
   /** Global context state  */
@@ -111,10 +110,15 @@ export default function List() {
 
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
+  const pathname = usePathname();
+
   // Clear search input when entering the list page
   useEffect(() => {
-    setSearchInput(null);
-  }, [setSearchInput]);
+    setSearchInput("");
+    setFilteredCities([]);
+    setTextInputPressIn(false);
+    textInputRef.current?.blur();
+  }, [setSearchInput, setTextInputPressIn, pathname]);
 
   /** Capitalize function */
   const capitalizeDesc = (desc: string) => {
@@ -171,7 +175,7 @@ export default function List() {
     };
 
     getData();
-  }, [WEATHER_API_KEY]);
+  }, [WEATHER_API_KEY, pathname]);
 
   /** filter */
 
@@ -198,7 +202,7 @@ export default function List() {
   const DeleteStorageItem = async (cityID: number) => {
     try {
       await AsyncStorage.removeItem(`city-${cityID}`);
-      router.push("/list");
+      router.replace("/list");
       setCities((prev) => {
         const updateded = prev.filter((v) => v?.cityID !== cityID);
         return updateded;
@@ -209,11 +213,13 @@ export default function List() {
   };
 
   // To sort the ‘myLocation’ city to the top
-  const sortedCities = [...cities].sort((a: AsyncWeatherData, b: AsyncWeatherData) => {
-    if (a.myLocation) return -1;
-    if (b.myLocation) return 1;
-    return 0;
-  });
+  const sortedCities = [...cities].sort(
+    (a: AsyncWeatherData, b: AsyncWeatherData) => {
+      if (a.myLocation) return -1;
+      if (b.myLocation) return 1;
+      return 0;
+    }
+  );
 
   /** Animations  */
 
@@ -329,6 +335,7 @@ export default function List() {
             }`}
           >
             <TextInput
+              value={searchInput}
               returnKeyType={"search"}
               className={`w-full h-12 rounded-xl px-4 text-lg leading-[20px] flex-1 ${
                 theme === "light"
@@ -353,7 +360,7 @@ export default function List() {
                 textInputRef.current?.clear();
                 setFilteredCities([]);
                 setTextInputPressIn(false);
-                setSearchInput(null);
+                setSearchInput("");
                 textInputRef.current?.blur();
               }}
               style={animatedCancelStyle}
@@ -388,7 +395,9 @@ export default function List() {
                   </Text>
                 </Pressable>
               )}
-              keyExtractor={(item: {id:number, name:string}) => item?.id.toString()}
+              keyExtractor={(item: { id: number; name: string }) =>
+                item?.id.toString()
+              }
             />
           ) : filterCities?.length === 0 && searchInput ? (
             // No results
@@ -429,11 +438,10 @@ export default function List() {
             {sortedCities?.length > 0 &&
             filterCities?.length === 0 &&
             !searchInput ? (
-              sortedCities?.map((v: AsyncWeatherData, i: number) => {           
-                const { isNight } =
-                  getLocalDayTime(v);
+              sortedCities?.map((v: AsyncWeatherData, i: number) => {
+                const { isNight } = getLocalDayTime(v);
                 const desc = v?.weather?.[0]?.description ?? "";
-                const cityID = v.cityID ? v.cityID : 0
+                const cityID = v.cityID ? v.cityID : 0;
 
                 return (
                   <View key={i} className="flex-row items-center flex-1">

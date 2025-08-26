@@ -63,27 +63,25 @@ export interface CurrnetWeatherData {
 }
 
 export interface DailyHourlyWeatherData {
- clouds: { all: number },
-  dt: number,
-  dt_txt: string,
+  clouds: { all: number };
+  dt: number;
+  dt_txt: string;
   main: {
-    feels_like: number,
-    grnd_level: number,
-    humidity: number,
-    pressure: number,
-    sea_level: number,
-    temp: number,
-    temp_kf: number,
-    temp_max: number,
-    temp_min: number
-  },
-  pop: number,
-  sys: { "pod": string },
-  visibility: number,
-  weather: [
-    { description: string, icon: string, id: number, main: string }
-  ],
-  wind: { deg: number, gust: number, speed: number }
+    feels_like: number;
+    grnd_level: number;
+    humidity: number;
+    pressure: number;
+    sea_level: number;
+    temp: number;
+    temp_kf: number;
+    temp_max: number;
+    temp_min: number;
+  };
+  pop: number;
+  sys: { pod: string };
+  visibility: number;
+  weather: [{ description: string; icon: string; id: number; main: string }];
+  wind: { deg: number; gust: number; speed: number };
 }
 
 interface CoordsData {
@@ -101,9 +99,8 @@ export default function Index() {
   const [location, setLocation] = useState<string | null>(null);
 
   /** For data */
-  const [currentWeather, setCurrentWeather] = useState<CurrnetWeatherData | null>(
-    null
-  );
+  const [currentWeather, setCurrentWeather] =
+    useState<CurrnetWeatherData | null>(null);
   const [hourlyWeather, setHourlyWeather] = useState([]);
   const [dailyWeather, setDailyWeather] = useState([]);
 
@@ -111,16 +108,14 @@ export default function Index() {
   const WEATHER_API_KEY = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
 
   const permissionDenied = (title: string, msg: string) =>
-    Alert.alert(title, msg, [
-      { text: "OK", onPress: () => console.log("OK Pressed") },
-    ]);
+    Alert.alert(title, msg);
 
   /**  To save in to Async storage */
   const saveIntoAsyncStorage = async (
     cityID: number,
     cityName: string,
     coords: CoordsData,
-    currentWeather:CurrnetWeatherData
+    currentWeather: CurrnetWeatherData
   ) => {
     /** 
         *  Find local time based on user's device time
@@ -142,7 +137,7 @@ export default function Index() {
       cityName: cityName,
       saveDate: todayString,
       coords: coords,
-      currentWeather:currentWeather
+      currentWeather: currentWeather,
     };
     try {
       const existing = await AsyncStorage.getItem("myLocation");
@@ -211,10 +206,15 @@ export default function Index() {
 
         setLocation(city);
 
-        saveIntoAsyncStorage(currentWeatherJSON.id, currentWeatherJSON.name, {
-          latitude: latitude,
-          longitude: longitude,
-        },currentWeatherJSON);
+        saveIntoAsyncStorage(
+          currentWeatherJSON.id,
+          currentWeatherJSON.name,
+          {
+            latitude: latitude,
+            longitude: longitude,
+          },
+          currentWeatherJSON
+        );
 
         // set Sunrise, Sunset time for React Context
 
@@ -238,7 +238,11 @@ export default function Index() {
           })
         );
       } catch (err) {
-        console.error(err);
+        console.log(err);
+        Alert.alert(
+          "Error",
+          "Unable to access location information. Please allow location permissions on your device."
+        );
       }
     }
     getCurrentLocation();
@@ -355,7 +359,6 @@ export default function Index() {
 
             <ScrollView horizontal={true}>
               {hourlyWeather?.map((v: DailyHourlyWeatherData, i: number) => {
-
                 /** Time format */
                 const hours = new Date(v?.dt_txt).getHours();
                 const period = hours >= 12 ? "pm" : "am";

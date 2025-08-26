@@ -44,7 +44,7 @@ export default function CustomHeader({ title }: { title?: string }) {
             <Ionicons name="map-outline" size={28} color={iconColor} />
           </Pressable>
         ) : (
-          <Pressable onPress={() => router.push("/")} hitSlop={5}>
+          <Pressable onPress={() => router.back()} hitSlop={5}>
             <Ionicons
               name="chevron-back-circle-outline"
               size={28}

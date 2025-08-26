@@ -33,6 +33,18 @@ export default function RootLayout() {
     }
   }, [sunrise, sunset]);
 
+  /** 
+    none,
+    fade,
+    fade_from_bottom,
+    slide_from_bottom,
+    slide_from_right,
+    slide_from_left,
+    simple_push,
+    flip,
+    default
+  */
+
   return (
     <SafeAreaProvider>
       <ThemeContext.Provider
@@ -46,22 +58,30 @@ export default function RootLayout() {
       >
         <ListProvider>
           <LocationProvider>
+            {/* Custom header */}
             <Stack
               screenOptions={{
                 header: (props) => {
                   return <CustomHeader title={props.options.title} />;
                 },
-                // contentStyle: {
-                //   backgroundColor: theme === "light" ? "#fed500" : "#080830",
-                // },
               }}
             >
+              {/* List */}
               <Stack.Screen name="list" />
+
+              {/* City page */}
               <Stack.Screen
                 name="city/[cityID]"
                 options={{ headerShown: false }}
               />
-              <Stack.Screen name="map" options={{ headerShown: false }} />
+
+              {/* Map */}
+              <Stack.Screen
+                name="map"
+                options={{ headerShown: false, animation: "fade" }}
+              />
+
+              {/* Not found */}
               <Stack.Screen name="+not-found" />
             </Stack>
           </LocationProvider>
