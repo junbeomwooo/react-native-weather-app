@@ -66,6 +66,8 @@ export default function RootLayout() {
                 },
               }}
             >
+              {/* Index */}
+              <Stack.Screen name="index" />
               {/* List */}
               <Stack.Screen name="list" />
 

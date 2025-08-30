@@ -2,7 +2,7 @@ import { ListContext } from "@/context/EditContext";
 import { ThemeContext } from "@/context/ThemeContext";
 import { usePathname, useRouter } from "expo-router";
 import { useContext } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Alert, Platform, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -36,11 +36,26 @@ export default function CustomHeader({ title }: { title?: string }) {
       }}
     >
       <View
-        className={`flex-row justify-between items-center ${textInputPressIn && "hidden"} ${pathname === "/list" && searchInput ? "hidden" : null}`}
+        className={`flex-row justify-between items-center ${
+          textInputPressIn && "hidden"
+        } ${pathname === "/list" && searchInput ? "hidden" : null}`}
       >
         {/* left */}
         {pathname === "/" ? (
-          <Pressable onPress={() => router.push("/map")} hitSlop={5}>
+          <Pressable
+            onPress={() => {
+              if (Platform.OS === "android") {
+                Alert.alert(
+                  "Notice",
+                  "This feature is not available on Android due to potential billing risks with Google Maps API."
+                );
+
+                return;
+              }
+              router.push("/map");
+            }}
+            hitSlop={5}
+          >
             <Ionicons name="map-outline" size={28} color={iconColor} />
           </Pressable>
         ) : (
@@ -70,13 +85,20 @@ export default function CustomHeader({ title }: { title?: string }) {
         ) : isEditOpen ? (
           <Pressable hitSlop={5} onPress={() => setIsEditOpen(false)}>
             <Text
-              className={`text-lg font-medium mr-2 py-[1.6px] ${theme === "light" ? "text-black" : "text-white"}`}
+              className={`text-lg font-medium mr-2 py-[1.6px] ${
+                theme === "light" ? "text-black" : "text-white"
+              }`}
             >
               Done
             </Text>
           </Pressable>
         ) : (
-          <Pressable hitSlop={5} onPress={() => {setIsEditOpen(true)}}>
+          <Pressable
+            hitSlop={5}
+            onPress={() => {
+              setIsEditOpen(true);
+            }}
+          >
             <AntDesign name="edit" size={28} color={iconColor} />
           </Pressable>
         )}
