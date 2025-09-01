@@ -52,6 +52,15 @@ export default function CustomHeader({ title }: { title?: string }) {
 
                 return;
               }
+
+              if (Platform.OS === "web") {
+                window.alert(
+                  "Map features are not supported on the web."
+                );
+
+                return;
+              }
+
               router.push("/map");
             }}
             hitSlop={5}

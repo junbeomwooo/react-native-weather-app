@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  Platform,
   ScrollView,
   Text,
   View,
@@ -163,6 +164,13 @@ export default function Index() {
   /** Get data */
   useEffect(() => {
     async function getCurrentLocation() {
+      if (Platform.OS === "web") {
+        window.alert(
+          "This application does not support the web. Please use a mobile device to access it."
+        );
+        return;
+      }
+
       try {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== "granted") {
