@@ -1,50 +1,73 @@
-# Welcome to your Expo app 👋
+# Weather Forecast App (React Native + Expo)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![WEBSITE](./assets/images//weather_app_mockup.jpeg)
+![WEBSITE](./assets//images//weather_app_mockup_dark.jpeg)
 
-## Get started
+• [View the app preview](https://expo.dev/preview/update?message=Publishing+Weather+Application&updateRuntimeVersion=1.0.0&createdAt=2025-09-02T00%3A26%3A36.713Z&slug=exp&projectId=bf7b74cf-6294-437a-b78e-c98a17564095&group=79b26f1c-aa42-417c-95b3-12ace4a547cf)
 
-1. Install dependencies
+<br /> <br />
+## Introduction
+A cross-platform weather app for iOS and Android, built with React Native and Expo. 
+It provides current, hourly, and daily forecasts. 
 
-   ```bash
-   npm install
-   ```
+The app automatically adjusts its theme according to local sunrise and sunset times, allows users to save their favorite cities, and view them on a map with detailed weather information.
 
-2. Start the app
+<br /> <br />
+## Development Environment
+• Client : HTML, React Native + Expo, Nativewind
 
-   ```bash
-   npx expo start
-   ```
+• Deployment environment : Expo
 
-In the output, you'll find options to open the app in a
+• Design : Figma, Adobe Illustrator, Adobe Photoshop
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+## Project structure  
+```
+.
+├── README.md
+├── app/
+│   ├── +not-found.tsx
+│   ├── _layout.tsx
+│   ├── index.tsx
+│   ├── list.tsx
+│   ├── map.tsx
+│   └── city/
+│       └── [cityID].tsx
+├── components/
+│   ├── CityHeader.tsx
+│   ├── CustomHeader.tsx
+│   └── Map/
+│       ├── map.tsx
+│       ├── map.web.tsx
+│       └── map.native.tsx
+├── context/
+│   ├── EditContext.tsx
+│   ├── LocationContext.tsx
+│   └── ThemeContext.tsx
+├── assets/
+│   ├── fonts/SpaceMono-Regular.ttf
+│   └── images/...
+├── hooks/
+│   ├── getLocalDayTime.tsx
+│   └── getWeatherIcons.tsx
+├── utils/weatherIcon.tsx
+├── android/
+│   ├── app/
+│   │   └── src/main/java/.../MainActivity.kt
+│   └── build.gradle
+├── ios/
+│   └── rnproject/
+│       └── AppDelegate.swift
+├── app.json
+├── tsconfig.json
+├── package.json
+├── yarn.lock / package-lock.json
+├── babel.config.js
+├── metro.config.js
+├── tailwind.config.js
+└── global.css
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+<br /> <br />
+## APIs Used  
+• OpenWeather API: Provides real-time weather data, including current conditions, forecasts, and other meteorological information.
